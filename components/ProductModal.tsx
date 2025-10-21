@@ -20,7 +20,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
         className="bg-white rounded-lg shadow-2xl w-full max-w-2xl transform transition-all scale-100 opacity-100 overflow-hidden" 
         onClick={e => e.stopPropagation()}
       >
-        <img src={product.image} alt={product.name} className="w-full h-56 object-cover"/>
+        <img src={product.image} alt={`Detailed view of ${product.name} solution`} className="w-full h-56 object-cover"/>
         <div className="p-8">
             <div className="flex justify-between items-start mb-4">
                 <div>

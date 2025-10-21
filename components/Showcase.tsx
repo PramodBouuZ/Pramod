@@ -33,11 +33,11 @@ const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, onProduc
               key={slide.id}
               className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
             >
-              <img src={slide.image} alt={slide.title} className="w-full h-full object-cover" />
+              <img src={slide.image} alt={slide.subtitle} className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center text-center p-4">
-                <h2 className="text-3xl md:text-4xl font-bold text-white mb-3 drop-shadow-lg">
+                <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 drop-shadow-lg">
                   {slide.title}
-                </h2>
+                </h1>
                 <p className="text-md md:text-lg text-slate-200 mb-5 max-w-2xl drop-shadow-md">
                   {slide.subtitle}
                 </p>
@@ -84,7 +84,7 @@ const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, onProduc
               onClick={() => onProductClick(product)}
               className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1 cursor-pointer group flex flex-col"
               >
-              <img src={product.image} alt={product.name} className="h-32 w-full object-cover transition-transform duration-300 group-hover:scale-105"/>
+              <img src={product.image} alt={`Promotional image for ${product.name}`} className="h-32 w-full object-cover transition-transform duration-300 group-hover:scale-105"/>
               <div className="p-4 text-center flex flex-col flex-grow">
                   <h3 className="font-bold text-slate-800 flex-grow">{product.name}</h3>
                   <p className="text-sm text-blue-600 font-semibold mt-2">{product.price}</p>
@@ -104,7 +104,7 @@ const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, onProduc
                   <div key={index} className="mx-12 flex-shrink-0 flex items-center justify-center" style={{ width: '160px', height: '60px' }}>
                     <img 
                       src={vendor.logo} 
-                      alt={vendor.name} 
+                      alt={`Logo of our trusted vendor: ${vendor.name}`}
                       className="max-h-full max-w-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300" 
                     />
                   </div>

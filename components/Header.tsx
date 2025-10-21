@@ -22,6 +22,11 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLoginClick, onSignUpC
     setMobileMenuOpen(false);
   }
 
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    onNavigate('home');
+  }
+
   return (
     <header className="sticky top-0 z-40">
       {/* Top utility bar */}
@@ -45,10 +50,10 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLoginClick, onSignUpC
       <div className="bg-white shadow-md">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
-            <div className="flex items-center cursor-pointer" onClick={() => onNavigate('home')}>
+            <a href="/" onClick={handleLogoClick} className="flex items-center cursor-pointer">
               <span className="text-3xl font-bold text-blue-600">BANT</span>
               <span className="text-3xl font-bold text-yellow-500">Confirm</span>
-            </div>
+            </a>
 
             <nav className="hidden md:flex items-center space-x-8">
               <button onClick={() => onNavigate('leads')} className="text-base font-medium text-slate-600 hover:text-blue-600 transition-colors">
@@ -108,10 +113,10 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLoginClick, onSignUpC
         <div className="fixed inset-0 z-50 bg-slate-100/95 backdrop-blur-sm md:hidden" onClick={() => setMobileMenuOpen(false)}>
           <div className="fixed top-0 right-0 bottom-0 w-full max-w-xs bg-white shadow-xl p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center" onClick={() => handleMobileNav('home')}>
+              <a href="/" onClick={(e) => { e.preventDefault(); handleMobileNav('home');}} className="flex items-center">
                 <span className="text-2xl font-bold text-blue-600">BANT</span>
                 <span className="text-2xl font-bold text-yellow-500">Confirm</span>
-              </div>
+              </a>
               <button
                 onClick={() => setMobileMenuOpen(false)}
                 className="text-slate-500 hover:text-slate-800 p-2 rounded-md -mr-2"
