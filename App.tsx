@@ -10,6 +10,7 @@ import ProductModal from './components/ProductModal';
 import PaymentModal from './components/PaymentModal';
 import AdminDashboard from './components/AdminDashboard';
 import AIAssistant from './components/AIAssistant';
+import { sendEmail } from './utils/emailService';
 
 // Mock Data
 const initialUsers: User[] = [
@@ -190,9 +191,58 @@ function App() {
   };
 
   const handleApproveLead = (leadId: string) => {
+    const leadToApprove = leads.find(lead => lead.id === leadId);
+    if (!leadToApprove) return;
+
     setLeads(leads.map(lead => lead.id === leadId ? { ...lead, status: 'approved' } : lead));
+
+    // Notify customer
+    if (leadToApprove.email) {
+      sendEmail(
+        leadToApprove.email,
+        `Your Lead "${leadToApprove.title}" has been Approved!`,
+        `<p>Hello ${leadToApprove.postedBy},</p>
+         <p>Great news! Your lead submission, "<b>${leadToApprove.title}</b>", has been reviewed and approved by our team.</p>
+         <p>It is now live on our platform for vendors to view. We wish you the best in finding the right service provider!</p>
+         <p>Thank you for using BANT Confirm.</p>`
+      );
+    }
+    
+    // Notify all active, verified vendors
+    const activeVerifiedVendors = users.filter(user => user.role === 'vendor' && user.status === 'active' && user.verified);
+    activeVerifiedVendors.forEach(vendor => {
+        sendEmail(
+            vendor.email,
+            `New High-Quality Lead Available: ${leadToApprove.title}`,
+            `<p>Hello ${vendor.name},</p>
+             <p>A new lead that might match your services has just been posted on BANT Confirm:</p>
+             <p><strong>Title:</strong> ${leadToApprove.title}</p>
+             <p><strong>Budget:</strong> ₹${leadToApprove.budget.toLocaleString('en-IN')}</p>
+             <p>Log in now to view the details and potentially unlock this opportunity!</p>`
+        );
+    });
   };
   
+  const handleRejectLead = (leadId: string, reason: string) => {
+    const leadToReject = leads.find(lead => lead.id === leadId);
+    if (!leadToReject) return;
+
+    setLeads(leads.map(lead => lead.id === leadId ? { ...lead, status: 'rejected', rejectedReason: reason } : lead));
+
+    // Notify customer
+    if (leadToReject.email) {
+       sendEmail(
+        leadToReject.email,
+        `Update on Your Lead Submission: "${leadToReject.title}"`,
+        `<p>Hello ${leadToReject.postedBy},</p>
+         <p>Thank you for submitting your lead, "<b>${leadToReject.title}</b>". After careful review, we were unable to approve it at this time.</p>
+         <p><strong>Reason:</strong> ${reason}</p>
+         <p>Please feel free to edit your submission based on this feedback and resubmit, or post a new enquiry with more details.</p>
+         <p>Thank you for using BANT Confirm.</p>`
+      );
+    }
+  };
+
   const handleMarkInternal = (leadId: string) => {
     setLeads(leads.map(lead => lead.id === leadId ? { ...lead, status: 'internal' } : lead));
   };
@@ -288,6 +338,7 @@ function App() {
           totalRevenue={totalRevenue}
           onApprove={handleApproveLead}
           onMarkInternal={handleMarkInternal}
+          onReject={handleRejectLead}
           onSetUserStatus={handleUserStatusChange}
           onSetUserVerification={handleUserVerificationChange}
           onAddNewBanner={handleAddNewBanner}

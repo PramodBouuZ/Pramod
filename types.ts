@@ -24,7 +24,8 @@ export interface Lead {
   email?: string;
   phone?: string;
   unlocked?: boolean;
-  status: 'pending' | 'approved' | 'internal';
+  status: 'pending' | 'approved' | 'internal' | 'rejected';
+  rejectedReason?: string;
 }
 
 export interface Product {

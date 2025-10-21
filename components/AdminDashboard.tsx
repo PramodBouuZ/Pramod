@@ -10,6 +10,7 @@ interface AdminDashboardProps {
   vendors: Vendor[];
   totalRevenue: number;
   onApprove: (leadId: string) => void;
+  onReject: (leadId: string, reason: string) => void;
   onMarkInternal: (leadId: string) => void;
   onSetUserStatus: (userId: string, status: 'active' | 'deactivated') => void;
   onSetUserVerification: (userId: string, isVerified: boolean) => void;
@@ -21,7 +22,7 @@ interface AdminDashboardProps {
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ 
   leads, users, slides, products, vendors, totalRevenue, 
-  onApprove, onMarkInternal, onSetUserStatus, onSetUserVerification, 
+  onApprove, onReject, onMarkInternal, onSetUserStatus, onSetUserVerification, 
   onAddNewBanner, onAddNewProduct, onAddNewVendor, onDeleteVendor
 }) => {
   const [newBannerTitle, setNewBannerTitle] = useState('');
@@ -39,6 +40,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const pendingLeads = leads.filter(l => l.status === 'pending');
   const approvedLeads = leads.filter(l => l.status === 'approved');
   const internalLeads = leads.filter(l => l.status === 'internal');
+  const rejectedLeads = leads.filter(l => l.status === 'rejected');
   const nonAdminUsers = users.filter(u => u.role !== 'admin');
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setImageState: (dataUrl: string) => void) => {
@@ -90,6 +92,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       alert('Please provide a name and logo for the vendor.');
     }
   };
+  
+  const handleRejectClick = (leadId: string) => {
+    const reason = prompt("Please provide a brief reason for rejecting this lead:");
+    if (reason && reason.trim()) {
+      onReject(leadId, reason.trim());
+    } else if (reason !== null) { // User didn't cancel the prompt but left it empty
+      alert("A reason is required to reject a lead.");
+    }
+  };
 
 
   const StatCard: React.FC<{ title: string; value: string | number; bgColor: string; }> = ({ title, value, bgColor }) => (
@@ -118,7 +129,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         <td className="px-6 py-4">
             <div className="flex items-center space-x-2">
                 <button onClick={() => onApprove(lead.id)} className="bg-green-500 text-white px-3 py-1 text-xs font-bold rounded-full hover:bg-green-600 transition">Approve</button>
-                <button onClick={() => onMarkInternal(lead.id)} className="bg-blue-500 text-white px-3 py-1 text-xs font-bold rounded-full hover:bg-blue-600 transition">Mark Internal</button>
+                <button onClick={() => onMarkInternal(lead.id)} className="bg-blue-500 text-white px-3 py-1 text-xs font-bold rounded-full hover:bg-blue-600 transition">Internal</button>
+                <button onClick={() => handleRejectClick(lead.id)} className="bg-red-500 text-white px-3 py-1 text-xs font-bold rounded-full hover:bg-red-600 transition">Reject</button>
             </div>
         </td>
     </tr>
@@ -170,10 +182,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <p className="text-slate-500 mt-1">Welcome, Admin! Here's an overview of your platform.</p>
         </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
         <StatCard title="Pending Review" value={pendingLeads.length} bgColor="bg-yellow-500" />
         <StatCard title="Published Leads" value={approvedLeads.length} bgColor="bg-green-500" />
         <StatCard title="Internal Deals" value={internalLeads.length} bgColor="bg-blue-500" />
+        <StatCard title="Rejected Leads" value={rejectedLeads.length} bgColor="bg-red-500" />
         <StatCard title="Total Revenue" value={`₹${totalRevenue.toLocaleString('en-IN')}`} bgColor="bg-indigo-500" />
       </div>
 
@@ -354,6 +367,39 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </tbody>
               </table>
           </div>
+      </div>
+       <div className="bg-white p-6 rounded-lg shadow-md">
+        <h2 className="text-xl font-semibold text-slate-700 mb-4">Rejected Leads ({rejectedLeads.length})</h2>
+        {rejectedLeads.length > 0 ? (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-left text-slate-500">
+              <thead className="text-xs text-slate-700 uppercase bg-slate-50">
+                <tr>
+                  <th scope="col" className="px-6 py-3">Lead Details</th>
+                  <th scope="col" className="px-6 py-3">Contact</th>
+                  <th scope="col" className="px-6 py-3">Rejection Reason</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rejectedLeads.map(lead => (
+                  <tr key={lead.id} className="bg-white border-b hover:bg-slate-50">
+                    <td className="px-6 py-4">
+                      <div className="font-medium text-slate-900">{lead.title}</div>
+                      <div className="text-xs text-slate-500">{lead.companyName}</div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="font-medium text-slate-700">{lead.email}</div>
+                      <div className="text-xs text-slate-500">{lead.postedBy}</div>
+                    </td>
+                    <td className="px-6 py-4 italic text-red-700">
+                      {lead.rejectedReason}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : <p className="text-slate-500">No rejected leads.</p>}
       </div>
     </div>
   );
