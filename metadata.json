@@ -1,0 +1,7 @@
+{
+  "name": "Copy of B2B Lead Platform",
+  "description": "A platform where businesses can post their requirements and service providers can purchase these leads to connect with potential customers.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
