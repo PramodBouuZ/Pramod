@@ -5,6 +5,8 @@ import EmailIcon from './icons/EmailIcon';
 import LockIcon from './icons/LockIcon';
 import BuildingIcon from './icons/BuildingIcon';
 import PhoneIcon from './icons/PhoneIcon';
+import AuthorityIcon from './icons/AuthorityIcon';
+import LocationIcon from './icons/LocationIcon';
 
 interface AuthModalProps {
   onClose: () => void;
@@ -17,8 +19,10 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onAuthSuccess }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [company, setCompany] = useState('');
+  const [companyName, setCompanyName] = useState('');
   const [phone, setPhone] = useState('');
+  const [location, setLocation] = useState('');
+  const [designation, setDesignation] = useState('');
   const [error, setError] = useState('');
 
   const handleAuth = (e: React.FormEvent) => {
@@ -38,11 +42,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onAuthSuccess }) => {
         phone: '',
         role: 'vendor', // Role will be determined by App.tsx from stored user data
         status: 'active',
+        location: '',
       };
       onAuthSuccess(loginAttemptUser);
     } else { // signup
-      if (!name || !email || !password || !company || !phone) {
-        setError('Please fill in all fields.');
+      if (!name || !email || !password || !phone || !location) {
+        setError('Please fill in all required fields.');
+        return;
+      }
+      if (role === 'vendor' && (!companyName || !designation)) {
+        setError('Please fill in all required fields for a vendor account.');
         return;
       }
       // Create a new user
@@ -53,6 +62,9 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onAuthSuccess }) => {
         phone, 
         role, 
         status: 'active',
+        location,
+        companyName: role === 'vendor' ? companyName : undefined,
+        designation: role === 'vendor' ? designation : undefined,
       };
       
       onAuthSuccess(newUser);
@@ -75,44 +87,67 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onAuthSuccess }) => {
           <p className="text-slate-500 text-sm text-center mb-8">{authMode === 'login' ? 'Sign in to access your account.' : 'Get started by creating a new account.'}</p>
           
           <form onSubmit={handleAuth} className="space-y-4">
-            {authMode === 'signup' && (
+            {authMode === 'login' && (
               <>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3"><UserIcon className="h-5 w-5 text-slate-400"/></span>
-                  <input type="text" placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3"><EmailIcon className="h-5 w-5 text-slate-400"/></span>
+                  <input type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                 </div>
                 <div className="relative">
-                  <span className="absolute inset-y-0 left-0 flex items-center pl-3"><BuildingIcon className="h-5 w-5 text-slate-400"/></span>
-                  <input type="text" placeholder="Company Name" value={company} onChange={e => setCompany(e.target.value)} className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3"><LockIcon className="h-5 w-5 text-slate-400"/></span>
+                  <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                 </div>
               </>
             )}
-            
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3"><EmailIcon className="h-5 w-5 text-slate-400"/></span>
-              <input type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            </div>
 
             {authMode === 'signup' && (
-               <div className="relative">
+              <>
+                <div>
+                  <span className="text-sm font-medium text-slate-700 mb-2 block">I am a:</span>
+                  <div className="flex space-x-2">
+                    <button type="button" onClick={() => setRole('vendor')} className={`w-full py-2 text-sm rounded-md border ${role === 'vendor' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-300'}`}>Vendor</button>
+                    <button type="button" onClick={() => setRole('customer')} className={`w-full py-2 text-sm rounded-md border ${role === 'customer' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-300'}`}>Customer</button>
+                  </div>
+                </div>
+
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3"><UserIcon className="h-5 w-5 text-slate-400"/></span>
+                  <input type="text" placeholder="Full Name" value={name} onChange={e => setName(e.target.value)} className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                </div>
+                
+                {role === 'vendor' && (
+                  <>
+                    <div className="relative">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3"><BuildingIcon className="h-5 w-5 text-slate-400"/></span>
+                      <input type="text" placeholder="Company Name" value={companyName} onChange={e => setCompanyName(e.target.value)} className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                    </div>
+                     <div className="relative">
+                      <span className="absolute inset-y-0 left-0 flex items-center pl-3"><AuthorityIcon className="h-5 w-5 text-slate-400"/></span>
+                      <input type="text" placeholder="Your Designation" value={designation} onChange={e => setDesignation(e.target.value)} className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                    </div>
+                  </>
+                )}
+                
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3"><EmailIcon className="h-5 w-5 text-slate-400"/></span>
+                  <input type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                </div>
+                
+                <div className="relative">
                   <span className="absolute inset-y-0 left-0 flex items-center pl-3"><PhoneIcon className="h-5 w-5 text-slate-400"/></span>
-                  <input type="tel" placeholder="Phone Number" value={phone} onChange={e => setPhone(e.target.value)} className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
+                  <input type="tel" placeholder="Phone Number" value={phone} onChange={e => setPhone(e.target.value)} className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                 </div>
-            )}
-            
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3"><LockIcon className="h-5 w-5 text-slate-400"/></span>
-              <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" />
-            </div>
 
-            {authMode === 'signup' && (
-              <div>
-                <span className="text-sm font-medium text-slate-700 mb-2 block">I am a:</span>
-                <div className="flex space-x-2">
-                  <button type="button" onClick={() => setRole('vendor')} className={`w-full py-2 text-sm rounded-md border ${role === 'vendor' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-300'}`}>Vendor</button>
-                  <button type="button" onClick={() => setRole('customer')} className={`w-full py-2 text-sm rounded-md border ${role === 'customer' ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-300'}`}>Customer</button>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3"><LocationIcon className="h-5 w-5 text-slate-400"/></span>
+                  <input type="text" placeholder="Location (e.g., Mumbai)" value={location} onChange={e => setLocation(e.target.value)} className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
                 </div>
-              </div>
+                
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3"><LockIcon className="h-5 w-5 text-slate-400"/></span>
+                  <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required />
+                </div>
+              </>
             )}
             
             {error && <p className="text-red-500 text-xs text-center">{error}</p>}

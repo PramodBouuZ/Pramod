@@ -373,6 +373,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           <td className="px-6 py-4">
                               <div className="font-medium text-slate-900">{user.name}</div>
                               <div className="text-xs text-slate-500">{user.email}</div>
+                              {user.role === 'vendor' && user.companyName && (
+                                <div className="text-xs text-slate-500 pt-1">
+                                    {user.designation} at <strong>{user.companyName}</strong>
+                                </div>
+                               )}
+                               {user.location && (
+                                <div className="text-xs text-slate-500">
+                                    {user.location}
+                                </div>
+                               )}
                           </td>
                           <td className="px-6 py-4 capitalize">{user.role}</td>
                           <td className="px-6 py-4">

@@ -14,12 +14,12 @@ import { sendEmail } from './utils/emailService';
 
 // Mock Data
 const initialUsers: User[] = [
-  { id: 'admin1', name: 'Admin User', email: 'admin@bant.com', phone: '+911111111111', role: 'admin', status: 'active' },
-  { id: 'vendor1', name: 'Sales Vendor', email: 'vendor@bant.com', phone: '+912222222222', role: 'vendor', status: 'active', verificationStatus: 'approved' },
-  { id: 'customer1', name: 'Happy Customer', email: 'customer@bant.com', phone: '+913333333333', role: 'customer', status: 'active' },
-  { id: 'vendor2', name: 'Inactive Vendor', email: 'inactive@bant.com', phone: '+914444444444', role: 'vendor', status: 'deactivated', verificationStatus: 'approved' },
-  { id: 'vendor3', name: 'Pending Vendor', email: 'pending@bant.com', phone: '+915555555555', role: 'vendor', status: 'active', verificationStatus: 'pending' },
-  { id: 'vendor4', name: 'Rejected Vendor', email: 'rejected@bant.com', phone: '+916666666666', role: 'vendor', status: 'active', verificationStatus: 'rejected' },
+  { id: 'admin1', name: 'Admin User', email: 'admin@bant.com', phone: '+911111111111', role: 'admin', status: 'active', location: 'Mumbai' },
+  { id: 'vendor1', name: 'Sales Vendor', email: 'vendor@bant.com', phone: '+912222222222', role: 'vendor', status: 'active', verificationStatus: 'approved', location: 'Delhi', companyName: 'Salesforce Inc.', designation: 'Sales Manager' },
+  { id: 'customer1', name: 'Happy Customer', email: 'customer@bant.com', phone: '+913333333333', role: 'customer', status: 'active', location: 'Bangalore' },
+  { id: 'vendor2', name: 'Inactive Vendor', email: 'inactive@bant.com', phone: '+914444444444', role: 'vendor', status: 'deactivated', verificationStatus: 'approved', location: 'Chennai', companyName: 'Inactive Corp', designation: 'Account Executive' },
+  { id: 'vendor3', name: 'Pending Vendor', email: 'pending@bant.com', phone: '+915555555555', role: 'vendor', status: 'active', verificationStatus: 'pending', location: 'Pune', companyName: 'Future Solutions', designation: 'Business Analyst' },
+  { id: 'vendor4', name: 'Rejected Vendor', email: 'rejected@bant.com', phone: '+916666666666', role: 'vendor', status: 'active', verificationStatus: 'rejected', location: 'Hyderabad', companyName: 'Rejected LLC', designation: 'Marketing Head' },
 ];
 
 const initialLeads: Lead[] = [
@@ -173,7 +173,7 @@ function App() {
       id: `lead-${Date.now()}`,
       title: analysis.title,
       description: analysis.reason,
-      companyName: currentUser.name,
+      companyName: currentUser.companyName || currentUser.name,
       budget: analysis.budget,
       authority: analysis.authority,
       need: analysis.need,

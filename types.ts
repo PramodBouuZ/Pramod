@@ -7,6 +7,9 @@ export interface User {
   role: 'customer' | 'vendor' | 'admin';
   status: 'active' | 'deactivated';
   verificationStatus?: 'pending' | 'approved' | 'rejected'; // For vendors
+  location: string;
+  companyName?: string; // Primarily for vendors
+  designation?: string; // For vendors
 }
 
 export interface Lead {
