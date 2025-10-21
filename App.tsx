@@ -260,6 +260,18 @@ function App() {
     setSlides(prevSlides => [...prevSlides, newBanner]);
   };
 
+  const handleEditBanner = (updatedSlide: Slide) => {
+    setSlides(prevSlides => prevSlides.map(slide => 
+      slide.id === updatedSlide.id ? updatedSlide : slide
+    ));
+  };
+
+  const handleDeleteBanner = (slideId: string) => {
+    if (window.confirm('Are you sure you want to delete this banner?')) {
+        setSlides(prevSlides => prevSlides.filter(slide => slide.id !== slideId));
+    }
+  };
+
   const handleAddNewProduct = (newProductData: Omit<Product, 'id'>) => {
     const newProduct: Product = { ...newProductData, id: `prod-${Date.now()}` };
     setProducts(prevProducts => [...prevProducts, newProduct]);
@@ -342,6 +354,8 @@ function App() {
           onSetUserStatus={handleUserStatusChange}
           onSetUserVerification={handleUserVerificationChange}
           onAddNewBanner={handleAddNewBanner}
+          onEditBanner={handleEditBanner}
+          onDeleteBanner={handleDeleteBanner}
           onAddNewProduct={handleAddNewProduct}
           onAddNewVendor={handleAddNewVendor}
           onDeleteVendor={handleDeleteVendor}

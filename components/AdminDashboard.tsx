@@ -15,6 +15,8 @@ interface AdminDashboardProps {
   onSetUserStatus: (userId: string, status: 'active' | 'deactivated') => void;
   onSetUserVerification: (userId: string, isVerified: boolean) => void;
   onAddNewBanner: (bannerData: Omit<Slide, 'id'>) => void;
+  onEditBanner: (slide: Slide) => void;
+  onDeleteBanner: (slideId: string) => void;
   onAddNewProduct: (productData: Omit<Product, 'id'>) => void;
   onAddNewVendor: (vendorData: Omit<Vendor, 'id'>) => void;
   onDeleteVendor: (vendorId: string) => void;
@@ -23,11 +25,12 @@ interface AdminDashboardProps {
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ 
   leads, users, slides, products, vendors, totalRevenue, 
   onApprove, onReject, onMarkInternal, onSetUserStatus, onSetUserVerification, 
-  onAddNewBanner, onAddNewProduct, onAddNewVendor, onDeleteVendor
+  onAddNewBanner, onEditBanner, onDeleteBanner, onAddNewProduct, onAddNewVendor, onDeleteVendor
 }) => {
   const [newBannerTitle, setNewBannerTitle] = useState('');
   const [newBannerSubtitle, setNewBannerSubtitle] = useState('');
   const [newBannerImage, setNewBannerImage] = useState('');
+  const [editingSlide, setEditingSlide] = useState<Slide | null>(null);
   
   const [newProductName, setNewProductName] = useState('');
   const [newProductImage, setNewProductImage] = useState('');
@@ -57,14 +60,39 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const handleAddBanner = (e: React.FormEvent) => {
     e.preventDefault();
     if (newBannerTitle && newBannerSubtitle && newBannerImage) {
-      onAddNewBanner({ title: newBannerTitle, subtitle: newBannerSubtitle, image: newBannerImage });
+      if (editingSlide) {
+        onEditBanner({
+          id: editingSlide.id,
+          title: newBannerTitle,
+          subtitle: newBannerSubtitle,
+          image: newBannerImage,
+        });
+      } else {
+        onAddNewBanner({ title: newBannerTitle, subtitle: newBannerSubtitle, image: newBannerImage });
+      }
       setNewBannerTitle('');
       setNewBannerSubtitle('');
       setNewBannerImage('');
+      setEditingSlide(null);
       (document.getElementById('banner-image-upload') as HTMLInputElement).value = '';
     } else {
       alert('Please fill all banner fields.');
     }
+  };
+
+  const handleEditClick = (slide: Slide) => {
+    setEditingSlide(slide);
+    setNewBannerTitle(slide.title);
+    setNewBannerSubtitle(slide.subtitle);
+    setNewBannerImage(slide.image);
+  };
+
+  const handleCancelEdit = () => {
+    setEditingSlide(null);
+    setNewBannerTitle('');
+    setNewBannerSubtitle('');
+    setNewBannerImage('');
+    (document.getElementById('banner-image-upload') as HTMLInputElement).value = '';
   };
 
   const handleAddProduct = (e: React.FormEvent) => {
@@ -201,12 +229,35 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                     <input type="text" placeholder="Banner Subtitle" value={newBannerSubtitle} onChange={e => setNewBannerSubtitle(e.target.value)} className="w-full px-3 py-2 border rounded-md" />
                     <div>
                         <label className="text-sm font-medium text-slate-700">Banner Image (JPG, GIF)</label>
+                        {editingSlide && newBannerImage && (
+                            <img src={newBannerImage} alt="Current banner" className="my-2 h-20 w-40 object-cover rounded-md border p-1 bg-white" />
+                        )}
                         <input id="banner-image-upload" type="file" accept=".jpg,.jpeg,.gif" onChange={e => handleImageUpload(e, setNewBannerImage)} className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
                     </div>
-                    <button type="submit" className="w-full bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700">Add New Banner</button>
+                    <div className="flex items-center space-x-2 pt-2">
+                        <button type="submit" className="flex-1 bg-blue-600 text-white font-semibold py-2 rounded-md hover:bg-blue-700 transition-colors">
+                            {editingSlide ? 'Update Banner' : 'Add New Banner'}
+                        </button>
+                        {editingSlide && (
+                            <button type="button" onClick={handleCancelEdit} className="flex-1 bg-slate-200 text-slate-700 font-semibold py-2 rounded-md hover:bg-slate-300 transition-colors">
+                            Cancel Edit
+                            </button>
+                        )}
+                    </div>
                 </form>
-                 <div className="mt-4 space-y-2 max-h-40 overflow-y-auto">
-                    {slides.map(slide => <div key={slide.id} className="text-sm p-2 bg-slate-100 rounded flex items-center gap-2"><img src={slide.image} className="h-6 w-10 object-cover rounded-sm" alt={slide.title} /><span>{slide.title}</span></div>)}
+                 <div className="mt-4 space-y-2 max-h-40 overflow-y-auto pr-2">
+                    {slides.map(slide => (
+                        <div key={slide.id} className="text-sm p-2 bg-slate-100 rounded-lg flex items-center justify-between gap-2 border border-slate-200">
+                            <div className="flex items-center gap-2 overflow-hidden">
+                                <img src={slide.image} className="h-8 w-14 object-cover rounded-sm flex-shrink-0" alt={slide.title} />
+                                <span className="font-medium text-slate-700 truncate">{slide.title}</span>
+                            </div>
+                            <div className="flex space-x-2 flex-shrink-0">
+                                <button onClick={() => handleEditClick(slide)} className="text-xs bg-white border border-slate-300 px-3 py-1 rounded-md hover:bg-slate-50 transition-colors">Edit</button>
+                                <button onClick={() => onDeleteBanner(slide.id)} className="text-xs bg-red-50 border border-red-200 text-red-600 px-3 py-1 rounded-md hover:bg-red-100 transition-colors">Delete</button>
+                            </div>
+                        </div>
+                    ))}
                 </div>
             </div>
             {/* Product Management */}
