@@ -6,7 +6,7 @@ export interface User {
   phone: string;
   role: 'customer' | 'vendor' | 'admin';
   status: 'active' | 'deactivated';
-  verified: boolean;
+  verificationStatus?: 'pending' | 'approved' | 'rejected'; // For vendors
 }
 
 export interface Lead {

@@ -201,9 +201,9 @@ Your conversation flow MUST follow these steps precisely:
             setSessionState('inactive');
             setStatusText('Idle');
           },
-          onerror: (e) => {
-            console.error(e);
-            addTranscript('error', 'An error occurred with the connection.');
+          onerror: (e: ErrorEvent) => {
+            console.error('Live session error:', e);
+            addTranscript('error', `An error occurred with the connection: ${e.message}. This could be due to a missing API key in your deployment environment or network issues.`);
             setSessionState('error');
             setStatusText('Error');
             stopSession();
@@ -212,7 +212,11 @@ Your conversation flow MUST follow these steps precisely:
       });
     } catch (err) {
       console.error(err);
-      addTranscript('error', 'Could not access the microphone. Please check your browser permissions.');
+      let errorMessage = 'Could not access the microphone. Please check your browser permissions.';
+      if (window.location.protocol !== 'https:') {
+        errorMessage = 'Microphone access requires a secure connection (HTTPS). Your site is currently on HTTP, which blocks microphone access in most browsers after deployment.';
+      }
+      addTranscript('error', errorMessage);
       setSessionState('error');
       setStatusText('Mic Error');
     }

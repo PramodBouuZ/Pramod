@@ -38,7 +38,6 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onAuthSuccess }) => {
         phone: '',
         role: 'vendor', // Role will be determined by App.tsx from stored user data
         status: 'active',
-        verified: false,
       };
       onAuthSuccess(loginAttemptUser);
     } else { // signup
@@ -46,16 +45,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onAuthSuccess }) => {
         setError('Please fill in all fields.');
         return;
       }
-      // Create a new user, unverified by default
+      // Create a new user
       const newUser: User = { 
         id: `user-${Date.now()}`, 
         name, 
         email, 
         phone, 
         role, 
-        status: 'active', 
-        verified: false 
+        status: 'active',
       };
+      
       onAuthSuccess(newUser);
     }
   };
