@@ -7,9 +7,9 @@ const Footer: React.FC = () => {
   return (
     <footer className="bg-slate-800 text-slate-300">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-8">
           {/* Brand Section */}
-          <div className="md:col-span-1">
+          <div className="md:col-span-4 sm:col-span-2">
             <div className="flex items-center mb-4">
               <span className="text-3xl font-bold text-blue-400">BANT</span>
               <span className="text-3xl font-bold text-yellow-400">Confirm</span>
@@ -20,7 +20,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Quick Links */}
-          <div>
+          <div className="md:col-span-2">
             <h3 className="text-sm font-semibold tracking-wider uppercase text-slate-200">Quick Links</h3>
             <ul className="mt-4 space-y-2">
               <li><a href="#" className="text-slate-400 hover:text-white transition-colors">Home</a></li>
@@ -31,7 +31,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Legal */}
-          <div>
+          <div className="md:col-span-2">
             <h3 className="text-sm font-semibold tracking-wider uppercase text-slate-200">Legal</h3>
             <ul className="mt-4 space-y-2">
               <li><a href="#" className="text-slate-400 hover:text-white transition-colors">Privacy Policy</a></li>
@@ -39,8 +39,17 @@ const Footer: React.FC = () => {
             </ul>
           </div>
 
+          {/* Contact Us */}
+          <div className="md:col-span-2">
+            <h3 className="text-sm font-semibold tracking-wider uppercase text-slate-200">Contact Us</h3>
+            <ul className="mt-4 space-y-2">
+              <li><a href="tel:9310269821" className="text-slate-400 hover:text-white transition-colors">9310269821</a></li>
+              <li><a href="mailto:pramod@bantconfirm.com" className="text-slate-400 hover:text-white transition-colors break-words">pramod@bantconfirm.com</a></li>
+            </ul>
+          </div>
+
           {/* Social Media */}
-          <div>
+          <div className="md:col-span-2">
             <h3 className="text-sm font-semibold tracking-wider uppercase text-slate-200">Follow Us</h3>
             <div className="flex mt-4 space-x-4">
               <a href="#" className="text-slate-400 hover:text-blue-400 transition-colors">

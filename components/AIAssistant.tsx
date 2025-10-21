@@ -284,15 +284,15 @@ Your conversation flow MUST follow these steps precisely:
     <>
       <button
         onClick={() => setIsPanelVisible(true)}
-        className={`fixed bottom-6 right-6 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 hover:scale-110 z-50 flex items-center space-x-3 ${isPanelVisible ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'}`}
+        className={`fixed bottom-4 right-4 bg-blue-600 text-white p-4 rounded-full shadow-lg hover:bg-blue-700 transition-all duration-300 hover:scale-110 z-50 flex items-center space-x-0 sm:space-x-3 ${isPanelVisible ? 'opacity-0 scale-95 pointer-events-none' : 'opacity-100 scale-100'}`}
         aria-label="Open AI Assistant"
       >
         <MicrophoneIcon className="h-7 w-7" />
-        <span className="font-semibold">AI Assistant</span>
+        <span className="font-semibold hidden sm:inline">AI Assistant</span>
         {sessionState === 'active' && <span className="absolute top-0 right-0 block h-3 w-3 rounded-full bg-green-400 ring-2 ring-white animate-pulse"></span>}
       </button>
 
-      <div className={`fixed bottom-6 right-6 w-[380px] h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden border border-slate-300 transition-all duration-300 ease-in-out ${isPanelVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
+      <div className={`fixed bottom-4 right-4 w-[calc(100%-2rem)] sm:w-[380px] max-w-sm h-[500px] bg-white rounded-2xl shadow-2xl flex flex-col z-50 overflow-hidden border border-slate-300 transition-all duration-300 ease-in-out ${isPanelVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
           <header className="flex items-center justify-between p-4 bg-slate-100 border-b border-slate-200">
               <div className="flex items-center space-x-2">
                   <MicrophoneIcon className="h-6 w-6 text-blue-600"/>

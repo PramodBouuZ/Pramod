@@ -26,7 +26,7 @@ const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, onProduc
 
   return (
     <>
-      <div className="relative w-full rounded-2xl overflow-hidden shadow-lg" style={{ height: '300px' }}>
+      <div className="relative w-full rounded-2xl overflow-hidden shadow-lg h-64 sm:h-[300px]">
         <div className="relative h-full w-full">
           {slides.map((slide, index) => (
             <div
