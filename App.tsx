@@ -13,10 +13,11 @@ import AIAssistant from './components/AIAssistant';
 
 // Mock Data
 const initialUsers: User[] = [
-  { id: 'admin1', name: 'Admin User', email: 'admin@bant.com', phone: '+911111111111', role: 'admin', status: 'active', verified: false },
+  { id: 'admin1', name: 'Admin User', email: 'admin@bant.com', phone: '+911111111111', role: 'admin', status: 'active', verified: true },
   { id: 'vendor1', name: 'Sales Vendor', email: 'vendor@bant.com', phone: '+912222222222', role: 'vendor', status: 'active', verified: true },
   { id: 'customer1', name: 'Happy Customer', email: 'customer@bant.com', phone: '+913333333333', role: 'customer', status: 'active', verified: false },
   { id: 'vendor2', name: 'Inactive Vendor', email: 'inactive@bant.com', phone: '+914444444444', role: 'vendor', status: 'deactivated', verified: false },
+  { id: 'vendor3', name: 'Unverified Vendor', email: 'unverified@bant.com', phone: '+915555555555', role: 'vendor', status: 'active', verified: false },
 ];
 
 const initialLeads: Lead[] = [
