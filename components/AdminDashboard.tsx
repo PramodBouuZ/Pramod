@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { Lead, User, Slide, Product, Vendor } from '../types';
+import VerifiedIcon from './icons/VerifiedIcon';
 
 interface AdminDashboardProps {
   leads: Lead[];
@@ -11,6 +12,7 @@ interface AdminDashboardProps {
   onApprove: (leadId: string) => void;
   onMarkInternal: (leadId: string) => void;
   onSetUserStatus: (userId: string, status: 'active' | 'deactivated') => void;
+  onSetUserVerification: (userId: string, isVerified: boolean) => void;
   onAddNewBanner: (bannerData: Omit<Slide, 'id'>) => void;
   onAddNewProduct: (productData: Omit<Product, 'id'>) => void;
   onAddNewVendor: (vendorData: Omit<Vendor, 'id'>) => void;
@@ -19,7 +21,8 @@ interface AdminDashboardProps {
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ 
   leads, users, slides, products, vendors, totalRevenue, 
-  onApprove, onMarkInternal, onSetUserStatus, onAddNewBanner, onAddNewProduct, onAddNewVendor, onDeleteVendor
+  onApprove, onMarkInternal, onSetUserStatus, onSetUserVerification, 
+  onAddNewBanner, onAddNewProduct, onAddNewVendor, onDeleteVendor
 }) => {
   const [newBannerTitle, setNewBannerTitle] = useState('');
   const [newBannerSubtitle, setNewBannerSubtitle] = useState('');
@@ -294,6 +297,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   <tr>
                       <th scope="col" className="px-6 py-3">User</th>
                       <th scope="col" className="px-6 py-3">Role</th>
+                      <th scope="col" className="px-6 py-3">Verification</th>
                       <th scope="col" className="px-6 py-3">Status</th>
                       <th scope="col" className="px-6 py-3">Actions</th>
                   </tr>
@@ -307,6 +311,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                           </td>
                           <td className="px-6 py-4 capitalize">{user.role}</td>
                           <td className="px-6 py-4">
+                            {user.role === 'vendor' ? (
+                                user.verified ? (
+                                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                        <VerifiedIcon className="h-4 w-4 mr-1" />
+                                        Verified
+                                    </span>
+                                ) : (
+                                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        Not Verified
+                                    </span>
+                                )
+                            ) : (
+                                <span className="text-slate-400 text-xs">N/A</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
                                 <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                                     user.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                                 }`}>
@@ -314,11 +334,20 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 </span>
                           </td>
                           <td className="px-6 py-4">
-                            {user.status === 'active' ? (
-                                <button onClick={() => onSetUserStatus(user.id, 'deactivated')} className="bg-red-500 text-white px-3 py-1 text-xs font-bold rounded-full hover:bg-red-600 transition">Deactivate</button>
-                            ) : (
-                                <button onClick={() => onSetUserStatus(user.id, 'active')} className="bg-green-500 text-white px-3 py-1 text-xs font-bold rounded-full hover:bg-green-600 transition">Activate</button>
-                            )}
+                            <div className="flex items-center space-x-2">
+                                {user.status === 'active' ? (
+                                    <button onClick={() => onSetUserStatus(user.id, 'deactivated')} className="bg-red-500 text-white px-3 py-1 text-xs font-bold rounded-full hover:bg-red-600 transition">Deactivate</button>
+                                ) : (
+                                    <button onClick={() => onSetUserStatus(user.id, 'active')} className="bg-green-500 text-white px-3 py-1 text-xs font-bold rounded-full hover:bg-green-600 transition">Activate</button>
+                                )}
+                                {user.role === 'vendor' && (
+                                    user.verified ? (
+                                        <button onClick={() => onSetUserVerification(user.id, false)} className="bg-yellow-500 text-white px-3 py-1 text-xs font-bold rounded-full hover:bg-yellow-600 transition">Unverify</button>
+                                    ) : (
+                                        <button onClick={() => onSetUserVerification(user.id, true)} className="bg-blue-500 text-white px-3 py-1 text-xs font-bold rounded-full hover:bg-blue-600 transition">Verify</button>
+                                    )
+                                )}
+                            </div>
                           </td>
                       </tr>
                   ))}

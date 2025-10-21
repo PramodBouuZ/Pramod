@@ -13,10 +13,10 @@ import AIAssistant from './components/AIAssistant';
 
 // Mock Data
 const initialUsers: User[] = [
-  { id: 'admin1', name: 'Admin User', email: 'admin@bant.com', phone: '+911111111111', role: 'admin', status: 'active' },
-  { id: 'vendor1', name: 'Sales Vendor', email: 'vendor@bant.com', phone: '+912222222222', role: 'vendor', status: 'active' },
-  { id: 'customer1', name: 'Happy Customer', email: 'customer@bant.com', phone: '+913333333333', role: 'customer', status: 'active' },
-  { id: 'vendor2', name: 'Inactive Vendor', email: 'inactive@bant.com', phone: '+914444444444', role: 'vendor', status: 'deactivated' },
+  { id: 'admin1', name: 'Admin User', email: 'admin@bant.com', phone: '+911111111111', role: 'admin', status: 'active', verified: false },
+  { id: 'vendor1', name: 'Sales Vendor', email: 'vendor@bant.com', phone: '+912222222222', role: 'vendor', status: 'active', verified: true },
+  { id: 'customer1', name: 'Happy Customer', email: 'customer@bant.com', phone: '+913333333333', role: 'customer', status: 'active', verified: false },
+  { id: 'vendor2', name: 'Inactive Vendor', email: 'inactive@bant.com', phone: '+914444444444', role: 'vendor', status: 'deactivated', verified: false },
 ];
 
 const initialLeads: Lead[] = [
@@ -92,16 +92,33 @@ function App() {
     setView(targetView);
   };
 
-  const handleAuthSuccess = (user: User) => {
-    if (user.email.toLowerCase() === 'admin@bant.com') {
-      user.role = 'admin';
+  const handleAuthSuccess = (userFromModal: User) => {
+    let finalUser: User | undefined;
+
+    // Check if it's a login attempt or a signup
+    if (userFromModal.id === 'login-attempt') {
+      finalUser = users.find(u => u.email.toLowerCase() === userFromModal.email.toLowerCase());
+      if (!finalUser) {
+        alert("Login failed. User not found.");
+        return;
+      }
+    } else { // It's a signup
+      const newUser = { ...userFromModal };
+      setUsers(prev => [...prev, newUser]);
+      finalUser = newUser;
     }
-    setCurrentUser(user);
+
+    if (finalUser.email.toLowerCase() === 'admin@bant.com') {
+      finalUser.role = 'admin';
+    }
+    
+    setCurrentUser(finalUser);
     setShowAuthModal(false);
     
-    if (user.role === 'admin') {
+    if (finalUser.role === 'admin') {
       setView('admin');
     } else {
+      // Redirect to home after login/signup
       setView('home');
     }
   };
@@ -117,6 +134,10 @@ function App() {
           return;
       }
       if (currentUser.role === 'vendor') {
+        if (!currentUser.verified) {
+            alert('Your account is not verified. Please contact an administrator to get verified before you can unlock leads.');
+            return;
+        }
         setShowPaymentModal(leadToUnlock);
       }
   };
@@ -177,6 +198,10 @@ function App() {
 
   const handleUserStatusChange = (userId: string, newStatus: 'active' | 'deactivated') => {
     setUsers(users.map(user => user.id === userId ? { ...user, status: newStatus } : user));
+  };
+
+  const handleUserVerificationChange = (userId: string, isVerified: boolean) => {
+    setUsers(users.map(user => user.id === userId ? { ...user, verified: isVerified } : user));
   };
 
   const handleAddNewBanner = (newBannerData: Omit<Slide, 'id'>) => {
@@ -263,6 +288,7 @@ function App() {
           onApprove={handleApproveLead}
           onMarkInternal={handleMarkInternal}
           onSetUserStatus={handleUserStatusChange}
+          onSetUserVerification={handleUserVerificationChange}
           onAddNewBanner={handleAddNewBanner}
           onAddNewProduct={handleAddNewProduct}
           onAddNewVendor={handleAddNewVendor}

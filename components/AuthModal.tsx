@@ -30,24 +30,32 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onAuthSuccess }) => {
         setError('Please enter both email and password.');
         return;
       }
-      // Mock login logic
-      const isAdmin = email.toLowerCase() === 'admin@bant.com';
-      const mockUser: User = { 
-        id: isAdmin ? 'admin1' : 'user1', 
-        name: isAdmin ? 'Admin User' : 'John Doe', 
-        email: email, 
-        phone: '+919876543210',
-        role: isAdmin ? 'admin' : 'vendor',
-        status: 'active'
+      // Create a temporary user object for the login attempt
+      const loginAttemptUser: User = {
+        id: 'login-attempt', // Special ID to signify a login attempt
+        name: 'Login',
+        email: email,
+        phone: '',
+        role: 'vendor', // Role will be determined by App.tsx from stored user data
+        status: 'active',
+        verified: false,
       };
-      onAuthSuccess(mockUser);
+      onAuthSuccess(loginAttemptUser);
     } else { // signup
       if (!name || !email || !password || !company || !phone) {
         setError('Please fill in all fields.');
         return;
       }
-      // Mock signup logic
-      const newUser: User = { id: `user-${Date.now()}`, name, email, phone, role, status: 'active' };
+      // Create a new user, unverified by default
+      const newUser: User = { 
+        id: `user-${Date.now()}`, 
+        name, 
+        email, 
+        phone, 
+        role, 
+        status: 'active', 
+        verified: false 
+      };
       onAuthSuccess(newUser);
     }
   };

@@ -6,6 +6,7 @@ export interface User {
   phone: string;
   role: 'customer' | 'vendor' | 'admin';
   status: 'active' | 'deactivated';
+  verified: boolean;
 }
 
 export interface Lead {
@@ -35,7 +36,7 @@ export interface Product {
 }
 
 export interface Vendor {
-  id: string;
+  id:string;
   name: string;
   logo: string;
 }
