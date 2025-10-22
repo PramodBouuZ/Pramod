@@ -32,13 +32,13 @@ const initialLeads: Lead[] = [
 const initialSlides: Slide[] = [
   {
     id: 'slide1',
-    image: 'https://images.unsplash.com/photo-1556740738-b6a63e27c4df?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    image: 'https://images.unsplash.com/photo-1556740738-b6a63e27c4df?q=80&w=1200&auto=format&fit=crop&fm=webp',
     title: 'Are you facing challenge after sales service,',
     subtitle: 'Don\'t worry Choose Bant Confirm for better service with reliable solutions',
   },
   {
     id: 'slide2',
-    image: 'https://images.unsplash.com/photo-1587560699334-cc426240169f?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
+    image: 'https://images.unsplash.com/photo-1587560699334-cc426240169f?q=80&w=1200&auto=format&fit=crop&fm=webp',
     title: 'Cloud Telephony Systems',
     subtitle: 'Upgrade your business communication with our reliable and scalable cloud phone systems.',
   },

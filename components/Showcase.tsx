@@ -44,7 +44,7 @@ const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, testimon
               key={slide.id}
               className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${index === currentSlide ? 'opacity-100' : 'opacity-0'}`}
             >
-              <img src={slide.image} alt={slide.subtitle} className="w-full h-full object-cover" />
+              <img src={slide.image} alt={slide.subtitle} className="w-full h-full object-cover" loading={index === 0 ? 'eager' : 'lazy'} />
               <div className="absolute inset-0 bg-black bg-opacity-50 flex flex-col justify-center items-center text-center p-4">
                 <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 drop-shadow-lg">
                   {slide.title}
@@ -101,7 +101,7 @@ const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, testimon
               onClick={() => onProductClick(product)}
               className="bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 ease-in-out hover:shadow-xl hover:-translate-y-1 cursor-pointer group flex flex-col"
               >
-              <img src={product.image} alt={`Promotional image for ${product.name}`} className="h-32 w-full object-cover transition-transform duration-300 group-hover:scale-105"/>
+              <img src={product.image} alt={`Promotional image for ${product.name}`} className="h-32 w-full object-cover transition-transform duration-300 group-hover:scale-105" loading="lazy"/>
               <div className="p-4 text-center flex flex-col flex-grow">
                   <h3 className="font-bold text-slate-800 flex-grow">{product.name}</h3>
                   <p className="text-sm text-blue-600 font-semibold mt-2">{product.price}</p>
@@ -129,6 +129,7 @@ const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, testimon
                       src={vendor.logo} 
                       alt={`Logo of our trusted vendor: ${vendor.name}`}
                       className="max-h-full max-w-full object-contain filter grayscale hover:grayscale-0 transition-all duration-300" 
+                      loading="lazy"
                     />
                   </div>
                 ))}
@@ -148,7 +149,7 @@ const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, testimon
               </svg>
               <p className="text-slate-600 italic leading-relaxed mb-6 flex-grow">"{testimonial.feedback}"</p>
               <div className="flex items-center mt-auto pt-4 border-t border-slate-200">
-                <img src={testimonial.userImage} alt={testimonial.userName} className="h-12 w-12 rounded-full object-cover mr-4 ring-2 ring-blue-100" />
+                <img src={testimonial.userImage} alt={testimonial.userName} className="h-12 w-12 rounded-full object-cover mr-4 ring-2 ring-blue-100" loading="lazy" />
                 <div>
                   <p className="font-bold text-slate-800">{testimonial.userName}</p>
                   <p className="text-sm text-slate-500">{testimonial.companyName}</p>
