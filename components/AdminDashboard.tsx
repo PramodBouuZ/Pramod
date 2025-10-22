@@ -18,7 +18,8 @@ interface AdminDashboardProps {
   onAddNewBanner: (bannerData: Omit<Slide, 'id'>) => void;
   onEditBanner: (slide: Slide) => void;
   onDeleteBanner: (slideId: string) => void;
-  onAddNewProduct: (productData: Omit<Product, 'id'>) => void;
+  onAddNewProduct: (productData: Omit<Product, 'id' | 'createdAt'>) => void;
+  onDeleteProduct: (productId: string) => void;
   onAddNewVendor: (vendorData: Omit<Vendor, 'id'>) => void;
   onDeleteVendor: (vendorId: string) => void;
 }
@@ -26,7 +27,7 @@ interface AdminDashboardProps {
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ 
   leads, users, slides, products, vendors, totalRevenue, 
   onApprove, onReject, onMarkInternal, onSetUserStatus, onSetVerificationStatus, onDeleteUser,
-  onAddNewBanner, onEditBanner, onDeleteBanner, onAddNewProduct, onAddNewVendor, onDeleteVendor
+  onAddNewBanner, onEditBanner, onDeleteBanner, onAddNewProduct, onDeleteProduct, onAddNewVendor, onDeleteVendor
 }) => {
   const [newBannerTitle, setNewBannerTitle] = useState('');
   const [newBannerSubtitle, setNewBannerSubtitle] = useState('');
@@ -41,11 +42,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [newVendorName, setNewVendorName] = useState('');
   const [newVendorLogo, setNewVendorLogo] = useState('');
 
+  const [userTab, setUserTab] = useState<'all' | 'customer' | 'vendor'>('all');
+
   const pendingLeads = leads.filter(l => l.status === 'pending');
   const approvedLeads = leads.filter(l => l.status === 'approved');
   const internalLeads = leads.filter(l => l.status === 'internal');
   const rejectedLeads = leads.filter(l => l.status === 'rejected');
+  
   const nonAdminUsers = users.filter(u => u.role !== 'admin');
+  const filteredUsers = nonAdminUsers.filter(user => {
+    if (userTab === 'all') return true;
+    return user.role === userTab;
+  });
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setImageState: (dataUrl: string) => void) => {
     const file = e.target.files?.[0];
@@ -131,6 +139,18 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     }
   };
 
+  const downloadCSV = (data: User[], filename: string) => {
+    const header = Object.keys(data[0]).join(',');
+    const rows = data.map(user => Object.values(user).join(',')).join('\n');
+    const csvContent = `data:text/csv;charset=utf-8,${header}\n${rows}`;
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `${filename}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   const StatCard: React.FC<{ title: string; value: string | number; bgColor: string; }> = ({ title, value, bgColor }) => (
     <div className={`${bgColor} p-6 rounded-lg shadow-md text-white`}>
@@ -164,45 +184,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
         </td>
     </tr>
   );
-
-  const renderLeadTable = (leadsToShow: Lead[], title: string) => (
-      <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold text-slate-700 mb-4">{title} ({leadsToShow.length})</h2>
-          {leadsToShow.length > 0 ? (
-            <div className="overflow-x-auto">
-                <table className="w-full text-sm text-left text-slate-500">
-                <thead className="text-xs text-slate-700 uppercase bg-slate-50">
-                    <tr>
-                        <th scope="col" className="px-6 py-3">Lead Details</th>
-                        <th scope="col" className="px-6 py-3">Budget</th>
-                        <th scope="col" className="px-6 py-3">Status</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {leadsToShow.map(lead => (
-                        <tr key={lead.id} className="bg-white border-b hover:bg-slate-50">
-                            <td className="px-6 py-4">
-                                <div className="font-medium text-slate-900">{lead.title}</div>
-                                <div className="text-xs text-slate-500">{lead.companyName}</div>
-                            </td>
-                            <td className="px-6 py-4">₹{lead.budget.toLocaleString('en-IN')}</td>
-                            <td className="px-6 py-4 capitalize">
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                    lead.status === 'approved' ? 'bg-green-100 text-green-800' :
-                                    lead.status === 'internal' ? 'bg-blue-100 text-blue-800' :
-                                    'bg-yellow-100 text-yellow-800'
-                                }`}>
-                                    {lead.status}
-                                </span>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-                </table>
-            </div>
-          ) : <p className="text-slate-500">No leads in this category.</p>}
-      </div>
-  )
+  
+  const tabBase = "px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200";
+  const tabActive = "bg-blue-600 text-white shadow";
+  const tabInactive = "bg-slate-100 text-slate-600 hover:bg-slate-200";
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -267,7 +252,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <form onSubmit={handleAddProduct} className="space-y-3 p-4 border rounded-lg bg-slate-50">
                     <input type="text" placeholder="Product Name" value={newProductName} onChange={e => setNewProductName(e.target.value)} className="w-full px-3 py-2 border rounded-md" />
                     <textarea placeholder="Features (separate with ' - ')" value={newProductDesc} onChange={e => setNewProductDesc(e.target.value)} className="w-full px-3 py-2 border rounded-md" rows={2}></textarea>
-                    <input type="text" placeholder="Price (e.g., Starts at ₹5,000)" value={newProductPrice} onChange={e => setNewProductPrice(e.target.value)} className="w-full px-3 py-2 border rounded-md" />
+                    <input type="text" placeholder="Price (e.g., Starts at ₹5,000/user/month)" value={newProductPrice} onChange={e => setNewProductPrice(e.target.value)} className="w-full px-3 py-2 border rounded-md" />
                     <div>
                         <label className="text-sm font-medium text-slate-700">Product Image (JPG, GIF)</label>
                         <input id="product-image-upload" type="file" accept=".jpg,.jpeg,.gif" onChange={e => handleImageUpload(e, setNewProductImage)} className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"/>
@@ -282,13 +267,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 <div>
                                     <div className="font-bold text-slate-800">{product.name}</div>
                                     <div className="text-xs font-semibold text-blue-600 mt-1">{product.price}</div>
-                                    {/* FIX: Replaced 'replaceAll' with 'replace' using a global regex for wider compatibility. */}
-                                    <p className="text-xs text-slate-500 mt-2">{product.description.replace(/ - /g, ', ')}</p>
+                                    <div className="text-xs text-slate-500 mt-1">Added: {product.createdAt.toLocaleDateString()}</div>
                                 </div>
                             </div>
                             <div className="flex flex-col space-y-1.5 flex-shrink-0">
                                 <button className="text-xs bg-white border border-slate-300 px-3 py-1 rounded-md hover:bg-slate-50 transition-colors">Edit</button>
-                                <button className="text-xs bg-red-50 border border-red-200 text-red-600 px-3 py-1 rounded-md hover:bg-red-100 transition-colors">Delete</button>
+                                <button onClick={() => onDeleteProduct(product.id)} className="text-xs bg-red-50 border border-red-200 text-red-600 px-3 py-1 rounded-md hover:bg-red-100 transition-colors">Delete</button>
                             </div>
                         </div>
                     ))}
@@ -328,7 +312,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
             </div>
         </div>
-
       </div>
 
 
@@ -355,20 +338,32 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       </div>
       
        <div className="bg-white p-6 rounded-lg shadow-md">
-          <h2 className="text-xl font-semibold text-slate-700 mb-4">User & Vendor Management ({nonAdminUsers.length})</h2>
+            <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-slate-700">User & Vendor Management ({filteredUsers.length})</h2>
+                <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg">
+                        <button onClick={() => setUserTab('all')} className={`${tabBase} ${userTab === 'all' ? tabActive : tabInactive}`}>All ({nonAdminUsers.length})</button>
+                        <button onClick={() => setUserTab('vendor')} className={`${tabBase} ${userTab === 'vendor' ? tabActive : tabInactive}`}>Vendors ({nonAdminUsers.filter(u => u.role === 'vendor').length})</button>
+                        <button onClick={() => setUserTab('customer')} className={`${tabBase} ${userTab === 'customer' ? tabActive : tabInactive}`}>Customers ({nonAdminUsers.filter(u => u.role === 'customer').length})</button>
+                    </div>
+                     <button onClick={() => downloadCSV(filteredUsers, `${userTab}-users`)} className="bg-green-100 text-green-800 font-medium py-2 px-4 rounded-lg hover:bg-green-200 transition duration-300 text-sm">
+                        Download CSV
+                    </button>
+                </div>
+            </div>
           <div className="overflow-x-auto">
               <table className="w-full text-sm text-left text-slate-500">
               <thead className="text-xs text-slate-700 uppercase bg-slate-50">
                   <tr>
                       <th scope="col" className="px-6 py-3">User</th>
-                      <th scope="col" className="px-6 py-3">Role</th>
-                      <th scope="col" className="px-6 py-3">Vendor Verification</th>
+                      <th scope="col" className="px-6 py-3">Role & Verification</th>
+                      <th scope="col" className="px-6 py-3">Vendor Approval</th>
                       <th scope="col" className="px-6 py-3">Account Status</th>
                       <th scope="col" className="px-6 py-3">Actions</th>
                   </tr>
               </thead>
               <tbody>
-                  {nonAdminUsers.map(user => (
+                  {filteredUsers.map(user => (
                       <tr key={user.id} className="bg-white border-b hover:bg-slate-50">
                           <td className="px-6 py-4">
                               <div className="font-medium text-slate-900">{user.name}</div>
@@ -384,7 +379,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
                                 </div>
                                )}
                           </td>
-                          <td className="px-6 py-4 capitalize">{user.role}</td>
+                          <td className="px-6 py-4">
+                              <div className="capitalize font-medium">{user.role}</div>
+                              {user.isEmailVerified ? (
+                                <span className="text-xs text-green-600">Email Verified</span>
+                              ) : (
+                                <span className="text-xs text-red-600">Email Not Verified</span>
+                              )}
+                          </td>
                           <td className="px-6 py-4">
                             {user.role === 'vendor' ? (
                                 <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium capitalize ${
@@ -433,6 +435,46 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </table>
           </div>
       </div>
+      
+        <div className="bg-white p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold text-slate-700 mb-4">Published & Unlocked Leads</h2>
+            <div className="overflow-x-auto">
+                <table className="w-full text-sm text-left text-slate-500">
+                    <thead className="text-xs text-slate-700 uppercase bg-slate-50">
+                        <tr>
+                            <th scope="col" className="px-6 py-3">Lead Title</th>
+                            <th scope="col" className="px-6 py-3">Budget</th>
+                            <th scope="col" className="px-6 py-3">Unlocked By</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {approvedLeads.map(lead => (
+                            <tr key={lead.id} className="bg-white border-b hover:bg-slate-50">
+                                <td className="px-6 py-4 font-medium text-slate-800">{lead.title}</td>
+                                <td className="px-6 py-4">₹{lead.budget.toLocaleString('en-IN')}</td>
+                                <td className="px-6 py-4">
+                                    {lead.unlockedBy && lead.unlockedBy.length > 0 ? (
+                                        <div className="flex flex-wrap gap-1">
+                                            {lead.unlockedBy.map(vendorId => {
+                                                const vendor = users.find(u => u.id === vendorId);
+                                                return (
+                                                    <span key={vendorId} className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
+                                                        {vendor ? vendor.name : 'Unknown Vendor'}
+                                                    </span>
+                                                );
+                                            })}
+                                        </div>
+                                    ) : (
+                                        <span className="text-xs text-slate-400">Not unlocked yet</span>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+       
        <div className="bg-white p-6 rounded-lg shadow-md">
         <h2 className="text-xl font-semibold text-slate-700 mb-4">Rejected Leads ({rejectedLeads.length})</h2>
         {rejectedLeads.length > 0 ? (

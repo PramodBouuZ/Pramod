@@ -14,16 +14,16 @@ import { sendEmail } from './utils/emailService';
 
 // Mock Data
 const initialUsers: User[] = [
-  { id: 'admin1', name: 'Admin User', email: 'admin@bant.com', phone: '+911111111111', role: 'admin', status: 'active', location: 'Mumbai' },
-  { id: 'vendor1', name: 'Sales Vendor', email: 'vendor@bant.com', phone: '+912222222222', role: 'vendor', status: 'active', verificationStatus: 'approved', location: 'Delhi', companyName: 'Salesforce Inc.', designation: 'Sales Manager' },
-  { id: 'customer1', name: 'Happy Customer', email: 'customer@bant.com', phone: '+913333333333', role: 'customer', status: 'active', location: 'Bangalore' },
-  { id: 'vendor2', name: 'Inactive Vendor', email: 'inactive@bant.com', phone: '+914444444444', role: 'vendor', status: 'deactivated', verificationStatus: 'approved', location: 'Chennai', companyName: 'Inactive Corp', designation: 'Account Executive' },
-  { id: 'vendor3', name: 'Pending Vendor', email: 'pending@bant.com', phone: '+915555555555', role: 'vendor', status: 'active', verificationStatus: 'pending', location: 'Pune', companyName: 'Future Solutions', designation: 'Business Analyst' },
-  { id: 'vendor4', name: 'Rejected Vendor', email: 'rejected@bant.com', phone: '+916666666666', role: 'vendor', status: 'active', verificationStatus: 'rejected', location: 'Hyderabad', companyName: 'Rejected LLC', designation: 'Marketing Head' },
+  { id: 'admin1', name: 'Admin User', email: 'admin@bant.com', phone: '+911111111111', role: 'admin', status: 'active', location: 'Mumbai', isEmailVerified: true },
+  { id: 'vendor1', name: 'Sales Vendor', email: 'vendor@bant.com', phone: '+912222222222', role: 'vendor', status: 'active', verificationStatus: 'approved', location: 'Delhi', companyName: 'Salesforce Inc.', designation: 'Sales Manager', isEmailVerified: true },
+  { id: 'customer1', name: 'Happy Customer', email: 'customer@bant.com', phone: '+913333333333', role: 'customer', status: 'active', location: 'Bangalore', isEmailVerified: true },
+  { id: 'vendor2', name: 'Inactive Vendor', email: 'inactive@bant.com', phone: '+914444444444', role: 'vendor', status: 'deactivated', verificationStatus: 'approved', location: 'Chennai', companyName: 'Inactive Corp', designation: 'Account Executive', isEmailVerified: true },
+  { id: 'vendor3', name: 'Pending Vendor', email: 'pending@bant.com', phone: '+915555555555', role: 'vendor', status: 'active', verificationStatus: 'pending', location: 'Pune', companyName: 'Future Solutions', designation: 'Business Analyst', isEmailVerified: true },
+  { id: 'vendor4', name: 'Rejected Vendor', email: 'rejected@bant.com', phone: '+916666666666', role: 'vendor', status: 'active', verificationStatus: 'rejected', location: 'Hyderabad', companyName: 'Rejected LLC', designation: 'Marketing Head', isEmailVerified: true },
 ];
 
 const initialLeads: Lead[] = [
-    { id: 'lead1', title: 'Need CRM for 50-person Sales Team', description: 'We are a logistics company in Mumbai looking for a CRM solution to manage our 50-person sales team. We need features like lead tracking, sales pipeline management, and integration with our existing accounting software.', companyName: 'Logistics Pro', budget: 500000, authority: 'Decision Maker', need: 'High', timeframe: '1-3 Months', postedAt: new Date(Date.now() - 86400000 * 1), postedBy: 'Rajesh Kumar', postedByImage: 'https://i.pravatar.cc/150?u=rajesh', email: 'rajesh@logipro.com', phone: '+919876543210', unlocked: true, status: 'approved' },
+    { id: 'lead1', title: 'Need CRM for 50-person Sales Team', description: 'We are a logistics company in Mumbai looking for a CRM solution to manage our 50-person sales team. We need features like lead tracking, sales pipeline management, and integration with our existing accounting software.', companyName: 'Logistics Pro', budget: 500000, authority: 'Decision Maker', need: 'High', timeframe: '1-3 Months', postedAt: new Date(Date.now() - 86400000 * 1), postedBy: 'Rajesh Kumar', postedByImage: 'https://i.pravatar.cc/150?u=rajesh', email: 'rajesh@logipro.com', phone: '+919876543210', unlocked: true, status: 'approved', unlockedBy: ['vendor1'] },
     { id: 'lead2', title: 'IVR System for Customer Support Center', description: 'Our e-commerce brand requires an IVR system to handle incoming customer calls. We expect around 1000 calls per day. The system should support multiple languages and have call routing capabilities.', companyName: 'Fashion Hub', budget: 200000, authority: 'Influencer', need: 'High', timeframe: 'Immediately', postedAt: new Date(Date.now() - 86400000 * 2), postedBy: 'Priya Sharma', postedByImage: 'https://i.pravatar.cc/150?u=priya', email: 'priya.sharma@fashionhub.co', phone: '+919123456789', unlocked: false, status: 'approved' },
     { id: 'lead3', title: 'Bulk SMS Gateway for Marketing Campaigns', description: 'We need a reliable bulk SMS gateway to send promotional messages to our customer base of over 1 million users. Looking for a scalable solution with good delivery rates.', companyName: 'QuickMart', budget: 150000, authority: 'Researcher', need: 'Medium', timeframe: '3-6 Months', postedAt: new Date(Date.now() - 86400000 * 5), postedBy: 'Amit Patel', email: 'amit@quickmart.io', phone: '+919988776655', unlocked: false, status: 'approved' },
     { id: 'lead4', title: 'Develop a Mobile App for Food Delivery', description: 'A startup looking for a vendor to develop a cross-platform mobile application for a new food delivery service. Key features include user registration, restaurant listings, order placement, and payment integration. ', companyName: 'YumWheels', budget: 800000, authority: 'Decision Maker', need: 'High', timeframe: '1-3 Months', postedAt: new Date(Date.now() - 3600000 * 2), postedBy: 'Sunita Rao', email: 'sunita.r@yumwheels.com', phone: '+919876501234', unlocked: false, status: 'pending' },
@@ -45,8 +45,8 @@ const initialSlides: Slide[] = [
 ];
 
 const initialProducts: Product[] = [
-  { id: 'prod1', name: 'CRM Solutions', image: 'https://placehold.co/600x400/4F46E5/FFF?text=CRM', description: 'Streamline sales processes - Manage customer relationships - Track communications effectively - Integrate with existing ERPs.', price: 'Starts at ₹15,000/month' },
-  { id: 'prod2', name: 'IVR Systems', image: 'https://placehold.co/600x400/F59E0B/FFF?text=IVR', description: 'Automated call routing - 24/7 customer self-service - Personalized customer greetings - Real-time call analytics.', price: 'Starts at ₹5,000/month' },
+  { id: 'prod1', name: 'CRM Solutions', image: 'https://placehold.co/600x400/4F46E5/FFF?text=CRM', description: 'Streamline sales processes - Manage customer relationships - Track communications effectively - Integrate with existing ERPs.', price: 'Starts at ₹15,000/user/month', createdAt: new Date() },
+  { id: 'prod2', name: 'IVR Systems', image: 'https://placehold.co/600x400/F59E0B/FFF?text=IVR', description: 'Automated call routing - 24/7 customer self-service - Personalized customer greetings - Real-time call analytics.', price: 'Starts at ₹5,000/month', createdAt: new Date() },
 ];
 
 const initialVendors: Vendor[] = [
@@ -105,13 +105,33 @@ function App() {
         alert("Login failed. User not found.");
         return;
       }
+      if (!finalUser.isEmailVerified) {
+        alert("Please verify your email address to log in.");
+        // Mock resend verification email
+        sendEmail(
+          finalUser.email,
+          'Verify Your Email for BANT Confirm',
+          `<p>Hello ${finalUser.name},</p><p>Please click the link below to verify your email address and activate your account. This is a mock verification.</p>`
+        );
+        return;
+      }
     } else { // It's a signup
-      const newUser = { ...userFromModal };
+      const newUser: User = { ...userFromModal, isEmailVerified: false };
       if (newUser.role === 'vendor') {
         newUser.verificationStatus = 'pending';
       }
       setUsers(prev => [...prev, newUser]);
       finalUser = newUser;
+      // Mock send verification email
+      sendEmail(
+        finalUser.email,
+        'Welcome to BANT Confirm! Please Verify Your Email',
+        `<p>Hello ${finalUser.name},</p><p>Thank you for registering. Please click the link below to verify your email address. This is a mock verification.</p><p>Once verified, you can log in to your account.</p>`
+      );
+      alert("Registration successful! Please check your email to verify your account.");
+      // FIX: Call setShowAuthModal to close the modal, as `onClose` is not defined here.
+      setShowAuthModal(false); // Close modal after successful signup instruction
+      return; // Don't log in immediately
     }
 
     if (finalUser.email.toLowerCase() === 'admin@bant.com') {
@@ -124,7 +144,7 @@ function App() {
     if (finalUser.role === 'admin') {
       setView('admin');
     } else {
-      // Redirect to home after login/signup
+      // Redirect to home after login
       setView('home');
     }
   };
@@ -157,9 +177,14 @@ function App() {
   };
   
   const handlePaymentConfirm = (leadId: string) => {
-    setLeads(prevLeads => prevLeads.map(lead => 
-      lead.id === leadId ? { ...lead, unlocked: true } : lead
-    ));
+    if (!currentUser) return;
+    setLeads(prevLeads => prevLeads.map(lead => {
+      if (lead.id === leadId) {
+        const updatedUnlockedBy = Array.from(new Set([...(lead.unlockedBy || []), currentUser.id]));
+        return { ...lead, unlocked: true, unlockedBy: updatedUnlockedBy };
+      }
+      return lead;
+    }));
     setShowPaymentModal(null);
   };
   
@@ -292,9 +317,15 @@ function App() {
     }
   };
 
-  const handleAddNewProduct = (newProductData: Omit<Product, 'id'>) => {
-    const newProduct: Product = { ...newProductData, id: `prod-${Date.now()}` };
+  const handleAddNewProduct = (newProductData: Omit<Product, 'id' | 'createdAt'>) => {
+    const newProduct: Product = { ...newProductData, id: `prod-${Date.now()}`, createdAt: new Date() };
     setProducts(prevProducts => [...prevProducts, newProduct]);
+  };
+
+  const handleDeleteProduct = (productId: string) => {
+    if (window.confirm('Are you sure you want to delete this product?')) {
+        setProducts(prevProducts => prevProducts.filter(p => p.id !== productId));
+    }
   };
 
   const handleAddNewVendor = (newVendorData: Omit<Vendor, 'id'>) => {
@@ -317,7 +348,8 @@ function App() {
   };
   
   const totalRevenue = useMemo(() => {
-    return leads.filter(lead => lead.unlocked).length * 100;
+    const unlockedCount = leads.reduce((acc, lead) => acc + (lead.unlockedBy?.length || 0), 0);
+    return unlockedCount * 100;
   }, [leads]);
 
   const filteredAndSortedLeads = useMemo(() => {
@@ -378,6 +410,7 @@ function App() {
           onEditBanner={handleEditBanner}
           onDeleteBanner={handleDeleteBanner}
           onAddNewProduct={handleAddNewProduct}
+          onDeleteProduct={handleDeleteProduct}
           onAddNewVendor={handleAddNewVendor}
           onDeleteVendor={handleDeleteVendor}
         />

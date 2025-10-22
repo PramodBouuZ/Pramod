@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import type { Product, Slide, Vendor } from '../types';
 
 interface ShowcaseProps {
@@ -11,6 +11,7 @@ interface ShowcaseProps {
 
 const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, onProductClick, onNavigate }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [productSearch, setProductSearch] = useState('');
 
   useEffect(() => {
     if (slides.length === 0) return;
@@ -23,6 +24,15 @@ const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, onProduc
   const goToSlide = (index: number) => {
     setCurrentSlide(index);
   };
+  
+  const filteredProducts = useMemo(() => {
+    if (!productSearch) return products;
+    const searchLower = productSearch.toLowerCase();
+    return products.filter(p => 
+      p.name.toLowerCase().includes(searchLower) ||
+      p.description.toLowerCase().includes(searchLower)
+    );
+  }, [products, productSearch]);
 
   return (
     <>
@@ -60,25 +70,22 @@ const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, onProduc
         </div>
       </div>
       
-      <div 
-        onClick={() => onNavigate('postEnquiry')}
-        className="my-12 w-full bg-blue-600 text-white overflow-hidden py-3 shadow-md rounded-lg cursor-pointer hover:bg-blue-700 transition-colors duration-300"
-      >
-        <div className="flex w-max animate-marquee">
-          <span className="text-base font-semibold mx-12 whitespace-nowrap">
-            Post your enquiry and get a reward up to 10% on the closed deal. ✨
-          </span>
-          <span className="text-base font-semibold mx-12 whitespace-nowrap" aria-hidden="true">
-            Post your enquiry and get a reward up to 10% on the closed deal. ✨
-          </span>
-        </div>
-      </div>
-
-      <div className="mb-8">
+      <div className="my-12">
           <h2 className="text-3xl font-bold text-slate-800 text-center mb-2">Explore Our Core Categories</h2>
-          <p className="text-slate-500 text-center mb-8">Click on any service to learn more about its features and pricing.</p>
+          <p className="text-slate-500 text-center mb-6">Find the perfect solution for your business needs.</p>
+          
+          <div className="max-w-xl mx-auto mb-8">
+            <input 
+              type="text"
+              placeholder="Search for products or features (e.g., 'CRM', 'call routing')..."
+              value={productSearch}
+              onChange={(e) => setProductSearch(e.target.value)}
+              className="w-full px-5 py-3 text-base border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 shadow-sm"
+            />
+          </div>
+
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
               <div 
               key={product.id} 
               onClick={() => onProductClick(product)}
@@ -95,6 +102,12 @@ const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, onProduc
               </div>
           ))}
           </div>
+          {filteredProducts.length === 0 && (
+             <div className="text-center bg-white p-12 rounded-lg shadow-sm mt-6">
+                <h3 className="text-xl font-semibold text-slate-700">No products match your search.</h3>
+                <p className="text-slate-500 mt-2">Try a different keyword or clear the search.</p>
+            </div>
+          )}
 
           <div className="mt-16 mb-8">
             <h2 className="text-3xl font-bold text-slate-800 text-center mb-8">Trusted By Top Vendors</h2>

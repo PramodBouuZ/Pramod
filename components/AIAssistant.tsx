@@ -158,8 +158,9 @@ Your conversation flow MUST follow these steps precisely:
               setStatusText('Thinking...');
               addTranscript('model', message.serverContent.outputTranscription.text);
             }
-             if (message.serverContent?.modelTurn?.parts[0]?.inlineData.data) {
-                const audioData = message.serverContent.modelTurn.parts[0].inlineData.data;
+            
+            const audioData = message.serverContent?.modelTurn?.parts?.[0]?.inlineData?.data;
+            if (audioData) {
                 const audioBuffer = await decodeAudioData(decode(audioData), outputAudioContextRef.current!, 24000, 1);
                 const source = outputAudioContextRef.current!.createBufferSource();
                 source.buffer = audioBuffer;
@@ -172,8 +173,9 @@ Your conversation flow MUST follow these steps precisely:
                 source.onended = () => {
                    if (statusText === 'Thinking...') setStatusText('Listening...');
                 };
-             }
-             if (message.toolCall?.functionCalls) {
+            }
+
+            if (message.toolCall?.functionCalls) {
                 for (const fc of message.toolCall.functionCalls) {
                     if (fc.name === 'captureLeadDetails') {
                         const args = fc.args as any;
@@ -194,7 +196,7 @@ Your conversation flow MUST follow these steps precisely:
                         });
                     }
                 }
-             }
+            }
           },
           onclose: () => {
             addTranscript('status', 'Connection closed.');

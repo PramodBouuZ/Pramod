@@ -11,6 +11,16 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
 
   const features = product.description.split(' - ').filter(f => f.trim() !== '');
 
+  const handleGetDetails = () => {
+    alert(`Inquiry submitted for details on ${product.name}. Our team will contact you shortly!`);
+    onClose();
+  };
+  
+  const handleBookDemo = () => {
+    alert(`Demo booked for ${product.name}. Please check your email for confirmation.`);
+    onClose();
+  };
+
   return (
     <div 
       className="fixed inset-0 bg-black bg-opacity-60 flex justify-center items-center z-50 p-4 transition-opacity duration-300" 
@@ -38,10 +48,14 @@ const ProductModal: React.FC<ProductModalProps> = ({ product, onClose }) => {
             </ul>
         </div>
         <div className="bg-slate-50 px-8 py-4 border-t border-slate-200 flex justify-end items-center space-x-3">
-            <button className="text-sm font-medium text-slate-600 bg-white hover:bg-slate-100 transition-colors px-4 py-2 rounded-md border border-slate-300">
+            <button 
+                onClick={handleGetDetails}
+                className="text-sm font-medium text-slate-600 bg-white hover:bg-slate-100 transition-colors px-4 py-2 rounded-md border border-slate-300">
                 Get Details
             </button>
-            <button className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors px-4 py-2 rounded-md shadow-sm">
+            <button 
+                onClick={handleBookDemo}
+                className="text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 transition-colors px-4 py-2 rounded-md shadow-sm">
                 Book a Demo
             </button>
         </div>

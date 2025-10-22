@@ -25,6 +25,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onAuthSuccess }) => {
   const [designation, setDesignation] = useState('');
   const [error, setError] = useState('');
 
+  const isValidEmail = (email: string): boolean => {
+    const emailRegex = new RegExp(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
+    return emailRegex.test(String(email).toLowerCase());
+  };
+
   const handleAuth = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -34,7 +41,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onAuthSuccess }) => {
         setError('Please enter both email and password.');
         return;
       }
+      if (!isValidEmail(email)) {
+        setError('Please enter a valid email address.');
+        return;
+      }
       // Create a temporary user object for the login attempt
+      // FIX: Add missing `isEmailVerified` property to satisfy the User type.
       const loginAttemptUser: User = {
         id: 'login-attempt', // Special ID to signify a login attempt
         name: 'Login',
@@ -43,6 +55,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onAuthSuccess }) => {
         role: 'vendor', // Role will be determined by App.tsx from stored user data
         status: 'active',
         location: '',
+        isEmailVerified: false, // This is a placeholder; real verification status is checked in App.tsx
       };
       onAuthSuccess(loginAttemptUser);
     } else { // signup
@@ -50,11 +63,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onAuthSuccess }) => {
         setError('Please fill in all required fields.');
         return;
       }
+      if (!isValidEmail(email)) {
+        setError('Please enter a valid email address.');
+        return;
+      }
       if (role === 'vendor' && (!companyName || !designation)) {
         setError('Please fill in all required fields for a vendor account.');
         return;
       }
       // Create a new user
+      // FIX: Add missing `isEmailVerified` property, defaulting to false for new signups.
       const newUser: User = { 
         id: `user-${Date.now()}`, 
         name, 
@@ -65,6 +83,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ onClose, onAuthSuccess }) => {
         location,
         companyName: role === 'vendor' ? companyName : undefined,
         designation: role === 'vendor' ? designation : undefined,
+        isEmailVerified: false,
       };
       
       onAuthSuccess(newUser);

@@ -10,6 +10,7 @@ export interface User {
   location: string;
   companyName?: string; // Primarily for vendors
   designation?: string; // For vendors
+  isEmailVerified: boolean;
 }
 
 export interface Lead {
@@ -27,6 +28,7 @@ export interface Lead {
   email?: string;
   phone?: string;
   unlocked?: boolean;
+  unlockedBy?: string[];
   status: 'pending' | 'approved' | 'internal' | 'rejected';
   rejectedReason?: string;
 }
@@ -37,6 +39,7 @@ export interface Product {
   image: string;
   description: string;
   price: string;
+  createdAt: Date;
 }
 
 export interface Vendor {
