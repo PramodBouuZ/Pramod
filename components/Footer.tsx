@@ -23,10 +23,10 @@ const Footer: React.FC = () => {
           <div className="md:col-span-2">
             <h3 className="text-sm font-semibold tracking-wider uppercase text-slate-200">Quick Links</h3>
             <ul className="mt-4 space-y-2">
-              <li><a href="/" className="text-slate-400 hover:text-white transition-colors">Home</a></li>
-              <li><a href="/" className="text-slate-400 hover:text-white transition-colors">About Us</a></li>
-              <li><a href="/" className="text-slate-400 hover:text-white transition-colors">Post a Lead</a></li>
-              <li><a href="/" className="text-slate-400 hover:text-white transition-colors">Find Leads</a></li>
+              <li><a href="#/" className="text-slate-400 hover:text-white transition-colors">Home</a></li>
+              <li><a href="#/about" className="text-slate-400 hover:text-white transition-colors">About Us</a></li>
+              <li><a href="#/postEnquiry" className="text-slate-400 hover:text-white transition-colors">Post a Lead</a></li>
+              <li><a href="#/leads" className="text-slate-400 hover:text-white transition-colors">Find Leads</a></li>
             </ul>
           </div>
 
@@ -34,8 +34,8 @@ const Footer: React.FC = () => {
           <div className="md:col-span-2">
             <h3 className="text-sm font-semibold tracking-wider uppercase text-slate-200">Legal</h3>
             <ul className="mt-4 space-y-2">
-              <li><a href="/" className="text-slate-400 hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="/" className="text-slate-400 hover:text-white transition-colors">Terms of Service</a></li>
+              <li><a href="#" className="text-slate-400 hover:text-white transition-colors">Privacy Policy</a></li>
+              <li><a href="#" className="text-slate-400 hover:text-white transition-colors">Terms of Service</a></li>
             </ul>
           </div>
 
@@ -52,15 +52,15 @@ const Footer: React.FC = () => {
           <div className="md:col-span-2">
             <h3 className="text-sm font-semibold tracking-wider uppercase text-slate-200">Follow Us</h3>
             <div className="flex mt-4 space-x-4">
-              <a href="/" className="text-slate-400 hover:text-blue-400 transition-colors">
+              <a href="#" className="text-slate-400 hover:text-blue-400 transition-colors">
                 <span className="sr-only">Facebook</span>
                 <FacebookIcon />
               </a>
-              <a href="/" className="text-slate-400 hover:text-blue-400 transition-colors">
+              <a href="#" className="text-slate-400 hover:text-blue-400 transition-colors">
                 <span className="sr-only">Twitter</span>
                 <TwitterIcon />
               </a>
-              <a href="/" className="text-slate-400 hover:text-blue-400 transition-colors">
+              <a href="#" className="text-slate-400 hover:text-blue-400 transition-colors">
                 <span className="sr-only">LinkedIn</span>
                 <LinkedInIcon />
               </a>

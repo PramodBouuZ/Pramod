@@ -52,9 +52,9 @@ const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, testimon
                 <p className="text-md md:text-lg text-slate-200 mb-5 max-w-2xl drop-shadow-md">
                   {slide.subtitle}
                 </p>
-                <button className="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105">
+                <a href="#/about" className="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105">
                   Learn More
-                </button>
+                </a>
               </div>
             </div>
           ))}

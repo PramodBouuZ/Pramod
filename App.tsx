@@ -5,7 +5,9 @@ import Showcase from './components/Showcase';
 import RequirementForm from './components/RequirementForm';
 import LeadBoard from './components/LeadBoard';
 import Footer from './components/Footer';
-import AuthModal from './components/AuthModal';
+import LoginScreen from './components/LoginScreen';
+import SignUp from './components/SignUp';
+import About from './components/About';
 import ProductModal from './components/ProductModal';
 import PaymentModal from './components/PaymentModal';
 import AdminDashboard from './components/AdminDashboard';
@@ -89,7 +91,7 @@ const initialTestimonials: Testimonial[] = [
   }
 ];
 
-type View = 'home' | 'leads' | 'postEnquiry' | 'admin';
+type View = 'home' | 'leads' | 'postEnquiry' | 'admin' | 'login' | 'signup' | 'about';
 
 function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -102,7 +104,6 @@ function App() {
   const [view, setView] = useState<View>('home');
 
   // Modal states
-  const [showAuthModal, setShowAuthModal] = useState(false);
   const [showProductModal, setShowProductModal] = useState<Product | null>(null);
   const [showPaymentModal, setShowPaymentModal] = useState<Lead | null>(null);
 
@@ -116,62 +117,61 @@ function App() {
   const [sortBy, setSortBy] = useState('newest');
 
   useEffect(() => {
-    const handleNavigationForHash = (hash: string) => {
-      const targetView = (hash === 'leads' || hash === 'postEnquiry' || hash === 'admin') ? hash as View : 'home';
-
+    const handleNavigation = () => {
+      const path = window.location.hash.substring(1); // a hash like #/login?role=vendor -> /login?role=vendor
+      const hash = path.split('?')[0].replace('/',''); // -> login
+      const targetView = (['leads', 'postEnquiry', 'admin', 'login', 'signup', 'about'].includes(hash)) ? hash as View : 'home';
+      
+      // Admin lock
       if (currentUser?.role === 'admin') {
-        setView('admin');
-        if (window.location.hash !== '#admin') {
-          window.location.hash = 'admin';
+        if (targetView !== 'admin') {
+            setView('admin');
+            window.location.hash = '/admin';
+        } else {
+            setView('admin');
         }
         return;
       }
-
-      if ((targetView === 'leads' || targetView === 'postEnquiry') && !currentUser) {
-        setShowAuthModal(true);
-        return; 
+      
+      // Auth guard for protected routes
+      const protectedViews: View[] = ['leads', 'postEnquiry', 'admin'];
+      if (protectedViews.includes(targetView) && !currentUser) {
+        window.location.hash = '/login';
+        return;
       }
       
+      // Prevent non-admins from accessing admin page
       if (targetView === 'admin' && currentUser?.role !== 'admin') {
-        setView('home');
-        window.location.hash = '';
+        window.location.hash = '/';
         return;
       }
 
       setView(targetView);
+      window.scrollTo(0, 0);
     };
 
-    const onHashChange = () => {
-      const hash = window.location.hash.substring(1);
-      handleNavigationForHash(hash);
-    };
+    handleNavigation(); // For initial load
 
-    onHashChange(); // For initial load
-
-    window.addEventListener('hashchange', onHashChange);
+    window.addEventListener('hashchange', handleNavigation);
     return () => {
-      window.removeEventListener('hashchange', onHashChange);
+      window.removeEventListener('hashchange', handleNavigation);
     };
   }, [currentUser]);
 
-  const handleNavigate = (targetView: 'home' | 'leads' | 'postEnquiry') => {
-    window.location.hash = targetView === 'home' ? '' : targetView;
-  };
-
-  const handleAuthSuccess = (userFromModal: User) => {
+  const handleAuthSuccess = (userFromAuth: User) => {
     let finalUser: User | undefined;
 
     // Login logic
-    if (userFromModal.id === 'login-attempt') {
-      finalUser = users.find(u => u.email.toLowerCase() === userFromModal.email.toLowerCase());
+    if (userFromAuth.id === 'login-attempt') {
+      finalUser = users.find(u => u.email.toLowerCase() === userFromAuth.email.toLowerCase());
       if (!finalUser) {
-        alert("Login failed. User not found.");
+        alert("Login failed. User not found or incorrect password.");
         return;
       }
     } 
     // Signup logic
     else { 
-      const newUser: User = { ...userFromModal, isEmailVerified: true }; 
+      const newUser: User = { ...userFromAuth, isEmailVerified: true }; 
       if (newUser.role === 'vendor') {
         newUser.verificationStatus = 'pending';
       }
@@ -185,30 +185,25 @@ function App() {
     }
     
     setCurrentUser(finalUser);
-    setShowAuthModal(false);
     
+    // Redirect after auth
     if (finalUser.role === 'admin') {
-      window.location.hash = 'admin';
+      window.location.hash = '/admin';
+    } else if (finalUser.role === 'vendor') {
+      window.location.hash = '/leads';
     } else {
-      // If user was trying to access a page, stay there. Otherwise, home.
-      const intendedHash = window.location.hash.substring(1);
-      if (intendedHash !== 'leads' && intendedHash !== 'postEnquiry') {
-        window.location.hash = '';
-      } else {
-        // Re-trigger navigation check now that user is logged in
-        handleNavigate(intendedHash as 'leads' | 'postEnquiry');
-      }
+      window.location.hash = '/postEnquiry';
     }
   };
   
   const handleLogout = () => {
     setCurrentUser(null);
-    window.location.hash = '';
+    window.location.hash = '/';
   };
 
   const handleUnlockLead = (leadToUnlock: Lead) => {
     if (!currentUser) {
-        setShowAuthModal(true);
+        window.location.hash = '/login';
         return;
     }
     if (currentUser.role === 'vendor') {
@@ -243,7 +238,7 @@ function App() {
   const handleFormSubmit = (analysis: BANTAnalysis) => {
     if (!currentUser) {
       alert("Please log in to submit an enquiry.");
-      setShowAuthModal(true);
+      window.location.hash = '/login';
       return;
     }
     const newLead: Lead = {
@@ -264,7 +259,7 @@ function App() {
     };
     setLeads([newLead, ...leads]);
     alert('Your enquiry has been submitted for review. It will be published after admin approval.');
-    handleNavigate('home');
+    window.location.hash = '/';
   };
 
   const handleAIGeneratedLead = (leadData: Omit<Lead, 'id' | 'postedAt' | 'status' | 'unlocked'>) => {
@@ -470,6 +465,12 @@ function App() {
     }
     
     switch (view) {
+        case 'login':
+            return <LoginScreen onAuthSuccess={handleAuthSuccess} />;
+        case 'signup':
+            return <SignUp onAuthSuccess={handleAuthSuccess} />;
+        case 'about':
+            return <About />;
         case 'leads':
             if (currentUser?.role !== 'vendor') {
                 return (
@@ -529,7 +530,7 @@ function App() {
                     vendors={vendors}
                     testimonials={testimonials}
                     onProductClick={(product) => setShowProductModal(product)}
-                    onNavigate={handleNavigate}
+                    onNavigate={(targetView) => window.location.hash = `/${targetView}`}
                 />
             );
     }
@@ -540,9 +541,6 @@ function App() {
       <Header 
         user={currentUser} 
         onLogout={handleLogout}
-        onLoginClick={() => setShowAuthModal(true)}
-        onSignUpClick={() => setShowAuthModal(true)}
-        onNavigate={handleNavigate}
       />
       
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -551,12 +549,6 @@ function App() {
 
       <Footer />
 
-      {showAuthModal && (
-        <AuthModal 
-          onClose={() => setShowAuthModal(false)}
-          onAuthSuccess={handleAuthSuccess} 
-        />
-      )}
       {showProductModal && (
         <ProductModal 
           product={showProductModal} 
