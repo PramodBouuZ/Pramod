@@ -55,6 +55,14 @@ export interface Slide {
     subtitle: string;
 }
 
+export interface Testimonial {
+  id: string;
+  userName: string;
+  companyName: string;
+  userImage: string;
+  feedback: string;
+}
+
 // BANT analysis result from Gemini
 export interface BANTAnalysis {
   budget: number;

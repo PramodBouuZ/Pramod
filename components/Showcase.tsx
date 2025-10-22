@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import type { Product, Slide, Vendor } from '../types';
+import type { Product, Slide, Vendor, Testimonial } from '../types';
 
 interface ShowcaseProps {
     slides: Slide[];
     products: Product[];
     vendors: Vendor[];
+    testimonials: Testimonial[];
     onProductClick: (product: Product) => void;
     onNavigate: (view: 'postEnquiry') => void;
 }
 
-const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, onProductClick, onNavigate }) => {
+const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, testimonials, onProductClick, onNavigate }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [productSearch, setProductSearch] = useState('');
 
@@ -69,6 +70,15 @@ const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, onProduc
           ))}
         </div>
       </div>
+
+      <div className="mt-8 bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-500 text-slate-900 font-semibold py-3 overflow-hidden whitespace-nowrap shadow-lg rounded-lg">
+        <div className="inline-block animate-marquee">
+            <span className="mx-12 text-lg">✨ Post your inquiry and get up to 10% commission on your closed deal.</span>
+            <span className="mx-12 text-lg">✨ Post your inquiry and get up to 10% commission on your closed deal.</span>
+            <span className="mx-12 text-lg">✨ Post your inquiry and get up to 10% commission on your closed deal.</span>
+            <span className="mx-12 text-lg">✨ Post your inquiry and get up to 10% commission on your closed deal.</span>
+        </div>
+      </div>
       
       <div className="my-12">
           <h2 className="text-3xl font-bold text-slate-800 text-center mb-2">Explore Our Core Categories</h2>
@@ -125,6 +135,28 @@ const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, onProduc
               </div>
             </div>
           </div>
+      </div>
+      
+      <div className="my-16">
+        <h2 className="text-3xl font-bold text-slate-800 text-center mb-2">What Our Customers Say</h2>
+        <p className="text-slate-500 text-center mb-10">Real feedback from businesses thriving with our leads.</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {testimonials.map((testimonial) => (
+            <div key={testimonial.id} className="bg-white p-8 rounded-xl shadow-lg border border-slate-200 flex flex-col">
+              <svg className="w-10 h-10 text-blue-200 mb-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 18 14">
+                <path d="M6 0H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4v1a3 3 0 0 1-3 3H2a1 1 0 0 0 0 2h1a5.006 5.006 0 0 0 5-5V2a2 2 0 0 0-2-2Zm10 0h-4a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h4v1a3 3 0 0 1-3 3h-1a1 1 0 0 0 0 2h1a5.006 5.006 0 0 0 5-5V2a2 2 0 0 0-2-2Z"/>
+              </svg>
+              <p className="text-slate-600 italic leading-relaxed mb-6 flex-grow">"{testimonial.feedback}"</p>
+              <div className="flex items-center mt-auto pt-4 border-t border-slate-200">
+                <img src={testimonial.userImage} alt={testimonial.userName} className="h-12 w-12 rounded-full object-cover mr-4 ring-2 ring-blue-100" />
+                <div>
+                  <p className="font-bold text-slate-800">{testimonial.userName}</p>
+                  <p className="text-sm text-slate-500">{testimonial.companyName}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );

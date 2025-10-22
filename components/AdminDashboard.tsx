@@ -50,10 +50,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const rejectedLeads = leads.filter(l => l.status === 'rejected');
   
   const nonAdminUsers = users.filter(u => u.role !== 'admin');
-  const filteredUsers = nonAdminUsers.filter(user => {
-    if (userTab === 'all') return true;
-    return user.role === userTab;
-  });
+  const vendorUsers = nonAdminUsers.filter(u => u.role === 'vendor');
+  const customerUsers = nonAdminUsers.filter(u => u.role === 'customer');
+  const filteredUsers = userTab === 'all' ? nonAdminUsers : userTab === 'vendor' ? vendorUsers : customerUsers;
+
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setImageState: (dataUrl: string) => void) => {
     const file = e.target.files?.[0];
@@ -185,9 +185,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
     </tr>
   );
   
-  const tabBase = "px-4 py-2 text-sm font-medium rounded-md transition-colors duration-200";
-  const tabActive = "bg-blue-600 text-white shadow";
-  const tabInactive = "bg-slate-100 text-slate-600 hover:bg-slate-200";
+  const tabBase = "px-3 pb-2 text-sm font-semibold transition-colors duration-200 border-b-2";
+  const tabActive = "text-blue-600 border-blue-600";
+  const tabInactive = "text-slate-500 hover:text-slate-800 border-transparent";
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
@@ -338,18 +338,24 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({
       </div>
       
        <div className="bg-white p-6 rounded-lg shadow-md">
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-slate-700">User & Vendor Management ({filteredUsers.length})</h2>
-                <div className="flex items-center space-x-2">
-                    <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg">
-                        <button onClick={() => setUserTab('all')} className={`${tabBase} ${userTab === 'all' ? tabActive : tabInactive}`}>All ({nonAdminUsers.length})</button>
-                        <button onClick={() => setUserTab('vendor')} className={`${tabBase} ${userTab === 'vendor' ? tabActive : tabInactive}`}>Vendors ({nonAdminUsers.filter(u => u.role === 'vendor').length})</button>
-                        <button onClick={() => setUserTab('customer')} className={`${tabBase} ${userTab === 'customer' ? tabActive : tabInactive}`}>Customers ({nonAdminUsers.filter(u => u.role === 'customer').length})</button>
-                    </div>
-                     <button onClick={() => downloadCSV(filteredUsers, `${userTab}-users`)} className="bg-green-100 text-green-800 font-medium py-2 px-4 rounded-lg hover:bg-green-200 transition duration-300 text-sm">
-                        Download CSV
+            <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold text-slate-700">User & Vendor Management</h2>
+                <button onClick={() => downloadCSV(filteredUsers, `${userTab}-users`)} className="bg-green-100 text-green-800 font-medium py-2 px-4 rounded-lg hover:bg-green-200 transition duration-300 text-sm">
+                    Download CSV
+                </button>
+            </div>
+            <div className="border-b border-slate-200 mt-4 mb-4">
+                <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                    <button onClick={() => setUserTab('all')} className={`${tabBase} ${userTab === 'all' ? tabActive : tabInactive}`}>
+                        All <span className="ml-1.5 rounded-full bg-slate-200 text-slate-600 px-2 py-0.5 text-xs">{nonAdminUsers.length}</span>
                     </button>
-                </div>
+                    <button onClick={() => setUserTab('vendor')} className={`${tabBase} ${userTab === 'vendor' ? tabActive : tabInactive}`}>
+                        Vendors <span className="ml-1.5 rounded-full bg-slate-200 text-slate-600 px-2 py-0.5 text-xs">{vendorUsers.length}</span>
+                    </button>
+                    <button onClick={() => setUserTab('customer')} className={`${tabBase} ${userTab === 'customer' ? tabActive : tabInactive}`}>
+                        Customers <span className="ml-1.5 rounded-full bg-slate-200 text-slate-600 px-2 py-0.5 text-xs">{customerUsers.length}</span>
+                    </button>
+                </nav>
             </div>
           <div className="overflow-x-auto">
               <table className="w-full text-sm text-left text-slate-500">

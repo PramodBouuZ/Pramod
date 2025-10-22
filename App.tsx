@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import type { User, Lead, Product, BANTAnalysis, Slide, Vendor } from './types';
+import type { User, Lead, Product, BANTAnalysis, Slide, Vendor, Testimonial } from './types';
 import Header from './components/Header';
 import Showcase from './components/Showcase';
 import RequirementForm from './components/RequirementForm';
@@ -58,6 +58,37 @@ const initialVendors: Vendor[] = [
   { id: 'vendor-6', name: 'Airtel', logo: 'https://placehold.co/150x50/E40000/FFF?text=Airtel' },
 ];
 
+const initialTestimonials: Testimonial[] = [
+  {
+    id: 'testimonial1',
+    userName: 'Aarav Sharma',
+    companyName: 'Innovate Solutions',
+    userImage: 'https://i.pravatar.cc/150?u=aarav',
+    feedback: 'BANT Confirm has been a game-changer for our sales team. The quality of leads is consistently high, and the platform is incredibly user-friendly. We\'ve closed more deals in the last quarter than we did in the previous two combined. Highly recommended!'
+  },
+  {
+    id: 'testimonial2',
+    userName: 'Priya Patel',
+    companyName: 'TechGrow Inc.',
+    userImage: 'https://i.pravatar.cc/150?u=priya',
+    feedback: 'The BANT analysis feature is pure genius. It saves us countless hours of qualifying leads, allowing us to focus on what we do best: selling. The support team is also very responsive and helpful. A fantastic service for any B2B company.'
+  },
+  {
+    id: 'testimonial3',
+    userName: 'Rohan Mehta',
+    companyName: 'Digital Creations',
+    userImage: 'https://i.pravatar.cc/150?u=rohan',
+    feedback: 'We were skeptical about buying leads at first, but BANT Confirm delivered on its promise. The leads are fresh and relevant, and the pricing is very reasonable. It has become an indispensable part of our growth strategy.'
+  },
+  {
+    id: 'testimonial4',
+    userName: 'Ananya Desai',
+    companyName: 'CloudNet Technologies',
+    userImage: 'https://i.pravatar.cc/150?u=ananya',
+    feedback: 'As a niche service provider, finding qualified leads was always a challenge. BANT Confirm provides us with a steady stream of prospects who are genuinely interested in our cloud telephony solutions. It has significantly boosted our pipeline.'
+  }
+];
+
 function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [leads, setLeads] = useState<Lead[]>(initialLeads);
@@ -65,6 +96,7 @@ function App() {
   const [slides, setSlides] = useState<Slide[]>(initialSlides);
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [vendors, setVendors] = useState<Vendor[]>(initialVendors);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials);
   const [view, setView] = useState<'home' | 'leads' | 'postEnquiry' | 'admin'>('home');
 
   // Modal states
@@ -98,40 +130,24 @@ function App() {
   const handleAuthSuccess = (userFromModal: User) => {
     let finalUser: User | undefined;
 
-    // Check if it's a login attempt or a signup
+    // Login logic
     if (userFromModal.id === 'login-attempt') {
       finalUser = users.find(u => u.email.toLowerCase() === userFromModal.email.toLowerCase());
       if (!finalUser) {
         alert("Login failed. User not found.");
         return;
       }
-      if (!finalUser.isEmailVerified) {
-        alert("Please verify your email address to log in.");
-        // Mock resend verification email
-        sendEmail(
-          finalUser.email,
-          'Verify Your Email for BANT Confirm',
-          `<p>Hello ${finalUser.name},</p><p>Please click the link below to verify your email address and activate your account. This is a mock verification.</p>`
-        );
-        return;
-      }
-    } else { // It's a signup
-      const newUser: User = { ...userFromModal, isEmailVerified: false };
+      // NOTE: The email verification check has been removed to simplify the user flow.
+    } 
+    // Signup logic
+    else { 
+      const newUser: User = { ...userFromModal, isEmailVerified: true }; 
       if (newUser.role === 'vendor') {
         newUser.verificationStatus = 'pending';
       }
       setUsers(prev => [...prev, newUser]);
       finalUser = newUser;
-      // Mock send verification email
-      sendEmail(
-        finalUser.email,
-        'Welcome to BANT Confirm! Please Verify Your Email',
-        `<p>Hello ${finalUser.name},</p><p>Thank you for registering. Please click the link below to verify your email address. This is a mock verification.</p><p>Once verified, you can log in to your account.</p>`
-      );
-      alert("Registration successful! Please check your email to verify your account.");
-      // FIX: Call setShowAuthModal to close the modal, as `onClose` is not defined here.
-      setShowAuthModal(false); // Close modal after successful signup instruction
-      return; // Don't log in immediately
+      alert('Registration successful! You are now logged in.');
     }
 
     if (finalUser.email.toLowerCase() === 'admin@bant.com') {
@@ -144,7 +160,6 @@ function App() {
     if (finalUser.role === 'admin') {
       setView('admin');
     } else {
-      // Redirect to home after login
       setView('home');
     }
   };
@@ -475,6 +490,7 @@ function App() {
                     slides={slides}
                     products={products}
                     vendors={vendors}
+                    testimonials={testimonials}
                     onProductClick={(product) => setShowProductModal(product)}
                     onNavigate={handleNavigate}
                 />
