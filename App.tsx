@@ -94,13 +94,86 @@ const initialTestimonials: Testimonial[] = [
 type View = 'home' | 'leads' | 'postEnquiry' | 'admin' | 'login' | 'signup' | 'about';
 
 function App() {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [leads, setLeads] = useState<Lead[]>(initialLeads);
-  const [users, setUsers] = useState<User[]>(initialUsers);
-  const [slides, setSlides] = useState<Slide[]>(initialSlides);
-  const [products, setProducts] = useState<Product[]>(initialProducts);
-  const [vendors, setVendors] = useState<Vendor[]>(initialVendors);
-  const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials);
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    try {
+      const savedUser = localStorage.getItem('bant-currentUser');
+      return savedUser ? JSON.parse(savedUser) : null;
+    } catch (e) {
+      console.error("Failed to parse current user from localStorage", e);
+      return null;
+    }
+  });
+
+  const [leads, setLeads] = useState<Lead[]>(() => {
+    try {
+      const savedLeads = localStorage.getItem('bant-leads');
+      if (savedLeads) {
+        return JSON.parse(savedLeads).map((lead: Lead) => ({
+          ...lead,
+          postedAt: new Date(lead.postedAt)
+        }));
+      }
+    } catch (e) {
+      console.error("Failed to parse leads from localStorage", e);
+    }
+    return initialLeads;
+  });
+
+  const [users, setUsers] = useState<User[]>(() => {
+    try {
+      const savedUsers = localStorage.getItem('bant-users');
+      return savedUsers ? JSON.parse(savedUsers) : initialUsers;
+    } catch (e) {
+      console.error("Failed to parse users from localStorage", e);
+      return initialUsers;
+    }
+  });
+
+  const [slides, setSlides] = useState<Slide[]>(() => {
+    try {
+      const savedSlides = localStorage.getItem('bant-slides');
+      return savedSlides ? JSON.parse(savedSlides) : initialSlides;
+    } catch (e) {
+      console.error("Failed to parse slides from localStorage", e);
+      return initialSlides;
+    }
+  });
+  
+  const [products, setProducts] = useState<Product[]>(() => {
+    try {
+      const savedProducts = localStorage.getItem('bant-products');
+      if (savedProducts) {
+        return JSON.parse(savedProducts).map((product: Product) => ({
+          ...product,
+          createdAt: new Date(product.createdAt)
+        }));
+      }
+    } catch(e) {
+       console.error("Failed to parse products from localStorage", e);
+    }
+    return initialProducts;
+  });
+
+  const [vendors, setVendors] = useState<Vendor[]>(() => {
+    try {
+      const savedVendors = localStorage.getItem('bant-vendors');
+      return savedVendors ? JSON.parse(savedVendors) : initialVendors;
+    } catch (e) {
+      console.error("Failed to parse vendors from localStorage", e);
+      return initialVendors;
+    }
+  });
+
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(() => {
+    try {
+      const savedTestimonials = localStorage.getItem('bant-testimonials');
+      return savedTestimonials ? JSON.parse(savedTestimonials) : initialTestimonials;
+    } catch (e) {
+      console.error("Failed to parse testimonials from localStorage", e);
+      return initialTestimonials;
+    }
+  });
+
   const [view, setView] = useState<View>('home');
 
   // Modal states
@@ -115,6 +188,54 @@ function App() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [sortBy, setSortBy] = useState('newest');
+
+  // --- PERSISTENCE EFFECTS ---
+  useEffect(() => {
+    try {
+      if (currentUser) {
+        localStorage.setItem('bant-currentUser', JSON.stringify(currentUser));
+      } else {
+        localStorage.removeItem('bant-currentUser');
+      }
+    } catch (e) { console.error("Failed to save current user to localStorage", e); }
+  }, [currentUser]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('bant-leads', JSON.stringify(leads));
+    } catch (e) { console.error("Failed to save leads to localStorage", e); }
+  }, [leads]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('bant-users', JSON.stringify(users));
+    } catch (e) { console.error("Failed to save users to localStorage", e); }
+  }, [users]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('bant-slides', JSON.stringify(slides));
+    } catch (e) { console.error("Failed to save slides to localStorage", e); }
+  }, [slides]);
+  
+  useEffect(() => {
+    try {
+      localStorage.setItem('bant-products', JSON.stringify(products));
+    } catch (e) { console.error("Failed to save products to localStorage", e); }
+  }, [products]);
+  
+  useEffect(() => {
+    try {
+      localStorage.setItem('bant-vendors', JSON.stringify(vendors));
+    } catch (e) { console.error("Failed to save vendors to localStorage", e); }
+  }, [vendors]);
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('bant-testimonials', JSON.stringify(testimonials));
+    } catch (e) { console.error("Failed to save testimonials to localStorage", e); }
+  }, [testimonials]);
+
 
   useEffect(() => {
     const handleNavigation = () => {
@@ -531,6 +652,8 @@ function App() {
                     testimonials={testimonials}
                     onProductClick={(product) => setShowProductModal(product)}
                     onNavigate={(targetView) => window.location.hash = `/${targetView}`}
+                    onFormSubmit={handleFormSubmit}
+                    user={currentUser}
                 />
             );
     }
