@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import type { User, Lead, Product, BANTAnalysis, Slide, Vendor, Testimonial } from './types';
 import Header from './components/Header';
 import Showcase from './components/Showcase';
@@ -89,6 +89,8 @@ const initialTestimonials: Testimonial[] = [
   }
 ];
 
+type View = 'home' | 'leads' | 'postEnquiry' | 'admin';
+
 function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [leads, setLeads] = useState<Lead[]>(initialLeads);
@@ -97,7 +99,7 @@ function App() {
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [vendors, setVendors] = useState<Vendor[]>(initialVendors);
   const [testimonials, setTestimonials] = useState<Testimonial[]>(initialTestimonials);
-  const [view, setView] = useState<'home' | 'leads' | 'postEnquiry' | 'admin'>('home');
+  const [view, setView] = useState<View>('home');
 
   // Modal states
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -113,18 +115,47 @@ function App() {
   const [endDate, setEndDate] = useState('');
   const [sortBy, setSortBy] = useState('newest');
 
-  const handleNavigate = (targetView: 'home' | 'leads' | 'postEnquiry') => {
-    if (currentUser?.role === 'admin') {
-      setView(targetView === 'home' ? 'home' : 'admin');
-      return;
-    }
-    
-    if ((targetView === 'leads' || targetView === 'postEnquiry') && !currentUser) {
+  useEffect(() => {
+    const handleNavigationForHash = (hash: string) => {
+      const targetView = (hash === 'leads' || hash === 'postEnquiry' || hash === 'admin') ? hash as View : 'home';
+
+      if (currentUser?.role === 'admin') {
+        setView('admin');
+        if (window.location.hash !== '#admin') {
+          window.location.hash = 'admin';
+        }
+        return;
+      }
+
+      if ((targetView === 'leads' || targetView === 'postEnquiry') && !currentUser) {
         setShowAuthModal(true);
         return; 
-    }
-    
-    setView(targetView);
+      }
+      
+      if (targetView === 'admin' && currentUser?.role !== 'admin') {
+        setView('home');
+        window.location.hash = '';
+        return;
+      }
+
+      setView(targetView);
+    };
+
+    const onHashChange = () => {
+      const hash = window.location.hash.substring(1);
+      handleNavigationForHash(hash);
+    };
+
+    onHashChange(); // For initial load
+
+    window.addEventListener('hashchange', onHashChange);
+    return () => {
+      window.removeEventListener('hashchange', onHashChange);
+    };
+  }, [currentUser]);
+
+  const handleNavigate = (targetView: 'home' | 'leads' | 'postEnquiry') => {
+    window.location.hash = targetView === 'home' ? '' : targetView;
   };
 
   const handleAuthSuccess = (userFromModal: User) => {
@@ -137,7 +168,6 @@ function App() {
         alert("Login failed. User not found.");
         return;
       }
-      // NOTE: The email verification check has been removed to simplify the user flow.
     } 
     // Signup logic
     else { 
@@ -158,15 +188,22 @@ function App() {
     setShowAuthModal(false);
     
     if (finalUser.role === 'admin') {
-      setView('admin');
+      window.location.hash = 'admin';
     } else {
-      setView('home');
+      // If user was trying to access a page, stay there. Otherwise, home.
+      const intendedHash = window.location.hash.substring(1);
+      if (intendedHash !== 'leads' && intendedHash !== 'postEnquiry') {
+        window.location.hash = '';
+      } else {
+        // Re-trigger navigation check now that user is logged in
+        handleNavigate(intendedHash as 'leads' | 'postEnquiry');
+      }
     }
   };
   
   const handleLogout = () => {
     setCurrentUser(null);
-    setView('home');
+    window.location.hash = '';
   };
 
   const handleUnlockLead = (leadToUnlock: Lead) => {
@@ -227,7 +264,7 @@ function App() {
     };
     setLeads([newLead, ...leads]);
     alert('Your enquiry has been submitted for review. It will be published after admin approval.');
-    setView('home');
+    handleNavigate('home');
   };
 
   const handleAIGeneratedLead = (leadData: Omit<Lead, 'id' | 'postedAt' | 'status' | 'unlocked'>) => {
@@ -406,7 +443,7 @@ function App() {
   }, [leads, searchTerm, minBudget, maxBudget, statusFilter, startDate, endDate, sortBy, currentUser]);
 
   const renderContent = () => {
-    if (currentUser?.role === 'admin' && view !== 'home') {
+    if (view === 'admin') {
       return (
         <AdminDashboard 
           leads={leads} 
