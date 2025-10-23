@@ -24,8 +24,7 @@ const SignUp: React.FC<SignUpProps> = ({ onAuthSuccess }) => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const hash = window.location.hash;
-    const params = new URLSearchParams(hash.split('?')[1]);
+    const params = new URLSearchParams(window.location.search);
     const roleFromQuery = params.get('role');
     if (roleFromQuery === 'customer' || roleFromQuery === 'vendor') {
       setRole(roleFromQuery);
@@ -133,7 +132,7 @@ const SignUp: React.FC<SignUpProps> = ({ onAuthSuccess }) => {
             </button>
 
             <p className="text-sm text-center text-slate-500 pt-3">
-              Already have an account? <a href="#/login" className="font-semibold text-blue-600 hover:underline">Login</a>
+              Already have an account? <a href="/login" className="font-semibold text-blue-600 hover:underline">Login</a>
             </p>
           </form>
         </div>

@@ -53,7 +53,7 @@ const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, testimon
                 <p className="text-md md:text-lg text-slate-200 mb-5 max-w-2xl drop-shadow-md">
                   {slide.subtitle}
                 </p>
-                <a href="#/about" className="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105">
+                <a href="/about" className="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition duration-300 ease-in-out transform hover:scale-105">
                   Learn More
                 </a>
               </div>
@@ -88,7 +88,7 @@ const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, testimon
             Let our AI assistant guide you through the process. It's fast, easy, and ensures your requirement reaches the right people.
         </p>
         <a 
-            href="#/postEnquiry"
+            href="/postEnquiry"
             className="inline-block bg-yellow-400 text-blue-900 font-bold py-3 px-8 rounded-lg hover:bg-yellow-500 transition-all duration-300 ease-in-out shadow-lg hover:shadow-xl transform hover:scale-105 text-lg"
         >
             Post Your Enquiry Now &rarr;

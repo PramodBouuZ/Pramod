@@ -237,17 +237,19 @@ function App() {
   }, [testimonials]);
 
 
+  // --- ROUTING EFFECT ---
   useEffect(() => {
+    // This function handles the logic of rendering the correct view based on the URL
     const handleNavigation = () => {
-      const path = window.location.hash.substring(1); // a hash like #/login?role=vendor -> /login?role=vendor
-      const hash = path.split('?')[0].replace('/',''); // -> login
-      const targetView = (['leads', 'postEnquiry', 'admin', 'login', 'signup', 'about'].includes(hash)) ? hash as View : 'home';
+      const path = window.location.pathname;
+      const viewName = path.split('?')[0].substring(1);
+      const targetView = (['leads', 'postEnquiry', 'admin', 'login', 'signup', 'about'].includes(viewName)) ? viewName as View : 'home';
       
       // Admin lock
       if (currentUser?.role === 'admin') {
         if (targetView !== 'admin') {
+            window.history.replaceState({}, '', '/admin');
             setView('admin');
-            window.location.hash = '/admin';
         } else {
             setView('admin');
         }
@@ -257,16 +259,14 @@ function App() {
       // Auth guard for protected routes
       const protectedViews: View[] = ['leads', 'postEnquiry', 'admin'];
       if (protectedViews.includes(targetView) && !currentUser) {
-        window.location.hash = '/login';
+        window.history.replaceState({}, '', '/login');
+        setView('login');
         return;
       }
       
-      // Prevent non-admins from accessing admin page
-      // FIX: The `currentUser?.role !== 'admin'` check is redundant due to the 'Admin lock' check above.
-      // TypeScript correctly infers that `currentUser.role` cannot be 'admin' at this point, causing a type error.
-      // The logic is still correct: if a non-admin tries to access the admin page, they are redirected.
-      if (targetView === 'admin') {
-        window.location.hash = '/';
+      if (targetView === 'admin' && currentUser?.role !== 'admin') {
+        window.history.replaceState({}, '', '/');
+        setView('home');
         return;
       }
 
@@ -274,60 +274,98 @@ function App() {
       window.scrollTo(0, 0);
     };
 
-    handleNavigation(); // For initial load
+    // This function intercepts local link clicks to prevent page reloads
+    const handleLinkClick = (e: MouseEvent) => {
+        const target = e.target as HTMLElement;
+        const anchor = target.closest('a');
+        
+        // Ensure it's an internal link, not mailto/tel, and not opening in a new tab
+        if (anchor && anchor.href && anchor.target !== '_blank' && !['mailto:', 'tel:'].some(p => anchor.href.startsWith(p))) {
+            const url = new URL(anchor.href);
+            if (url.origin === window.location.origin) {
+                e.preventDefault();
+                // Only push state if the URL is actually different
+                if (window.location.pathname !== url.pathname || window.location.search !== url.search) {
+                    window.history.pushState({}, '', anchor.href);
+                    handleNavigation();
+                }
+            }
+        }
+    };
 
-    window.addEventListener('hashchange', handleNavigation);
+    // Listen for browser back/forward button clicks
+    window.addEventListener('popstate', handleNavigation);
+    // Listen for all clicks on the document
+    document.addEventListener('click', handleLinkClick);
+
+    // Run navigation logic on initial load or when the user's auth state changes
+    handleNavigation();
+
     return () => {
-      window.removeEventListener('hashchange', handleNavigation);
+      window.removeEventListener('popstate', handleNavigation);
+      document.removeEventListener('click', handleLinkClick);
     };
   }, [currentUser]);
 
+
+  // Custom navigate function to be used by handlers
+  const navigate = (path: string) => {
+    window.history.pushState({}, '', path);
+    // Create and dispatch a popstate event to trigger the navigation handler in the useEffect
+    const navEvent = new PopStateEvent('popstate');
+    window.dispatchEvent(navEvent);
+  };
+
+  // FIX: Refactored handleAuthSuccess to avoid mutating a user object with a narrowed type.
+  // This resolves a TypeScript error where `currentUser.role` was being incorrectly inferred.
   const handleAuthSuccess = (userFromAuth: User) => {
-    let finalUser: User | undefined;
+    let authenticatedUser: User | undefined;
 
     // Login logic
     if (userFromAuth.id === 'login-attempt') {
-      finalUser = users.find(u => u.email.toLowerCase() === userFromAuth.email.toLowerCase());
-      if (!finalUser) {
+      authenticatedUser = users.find(u => u.email.toLowerCase() === userFromAuth.email.toLowerCase());
+      if (!authenticatedUser) {
         alert("Login failed. User not found or incorrect password.");
         return;
       }
-    } 
+    }
     // Signup logic
-    else { 
-      const newUser: User = { ...userFromAuth, isEmailVerified: true }; 
+    else {
+      const newUser: User = { ...userFromAuth, isEmailVerified: true };
       if (newUser.role === 'vendor') {
         newUser.verificationStatus = 'pending';
       }
       setUsers(prev => [...prev, newUser]);
-      finalUser = newUser;
+      authenticatedUser = newUser;
       alert('Registration successful! You are now logged in.');
     }
+    
+    // Check if user should be an admin, and create a new user object if so.
+    // This avoids mutating an object that might have a narrowed type from signup.
+    const finalUser: User = authenticatedUser.email.toLowerCase() === 'admin@bant.com'
+      ? { ...authenticatedUser, role: 'admin' }
+      : authenticatedUser;
 
-    if (finalUser.email.toLowerCase() === 'admin@bant.com') {
-      finalUser.role = 'admin';
-    }
-    
     setCurrentUser(finalUser);
-    
+
     // Redirect after auth
     if (finalUser.role === 'admin') {
-      window.location.hash = '/admin';
+      navigate('/admin');
     } else if (finalUser.role === 'vendor') {
-      window.location.hash = '/leads';
+      navigate('/leads');
     } else {
-      window.location.hash = '/postEnquiry';
+      navigate('/postEnquiry');
     }
   };
   
   const handleLogout = () => {
     setCurrentUser(null);
-    window.location.hash = '/';
+    navigate('/');
   };
 
   const handleUnlockLead = (leadToUnlock: Lead) => {
     if (!currentUser) {
-        window.location.hash = '/login';
+        navigate('/login');
         return;
     }
     if (currentUser.role === 'vendor') {
@@ -362,7 +400,7 @@ function App() {
   const handleFormSubmit = (formData: EnquiryFormData) => {
     if (!currentUser) {
       alert("Please log in to submit an enquiry.");
-      window.location.hash = '/login';
+      navigate('/login');
       return;
     }
     const newLead: Lead = {
@@ -383,7 +421,7 @@ function App() {
     };
     setLeads([newLead, ...leads]);
     alert('Your enquiry has been submitted for review. It will be published after admin approval.');
-    window.location.hash = '/';
+    navigate('/');
   };
 
   const handleAIGeneratedLead = (leadData: Omit<Lead, 'id' | 'postedAt' | 'status' | 'unlocked'>) => {
@@ -654,7 +692,7 @@ function App() {
                     vendors={vendors}
                     testimonials={testimonials}
                     onProductClick={(product) => setShowProductModal(product)}
-                    onNavigate={(targetView) => window.location.hash = `/${targetView}`}
+                    onNavigate={(targetView) => navigate(`/${targetView}`)}
                 />
             );
     }

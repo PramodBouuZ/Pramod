@@ -48,10 +48,10 @@ const About: React.FC = () => {
         <h2 className="text-3xl font-bold text-slate-800">Join Our Growing Platform</h2>
         <p className="mt-3 text-slate-600">Whether you're looking for a service or providing one, BANT Confirm is your trusted partner for growth.</p>
         <div className="mt-6 flex justify-center gap-4">
-            <a href="#/signup?role=customer" className="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300">
+            <a href="/signup?role=customer" className="bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition duration-300">
                 Post an Enquiry
             </a>
-            <a href="#/signup?role=vendor" className="bg-slate-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-800 transition duration-300">
+            <a href="/signup?role=vendor" className="bg-slate-700 text-white font-bold py-3 px-6 rounded-lg hover:bg-slate-800 transition duration-300">
                 Become a Vendor
             </a>
         </div>

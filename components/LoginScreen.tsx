@@ -69,7 +69,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onAuthSuccess }) => {
             </button>
             
             <p className="text-sm text-center text-slate-500 pt-4">
-              Don't have an account? <a href="#/signup" className="font-semibold text-blue-600 hover:underline">Sign Up</a>
+              Don't have an account? <a href="/signup" className="font-semibold text-blue-600 hover:underline">Sign Up</a>
             </p>
           </form>
         </div>
