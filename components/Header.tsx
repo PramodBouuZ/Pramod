@@ -20,13 +20,22 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-end items-center h-9">
             <div className="flex items-center space-x-4 text-xs font-medium text-slate-600">
-              <a href="#/signup?role=vendor" className="hover:text-blue-600 transition-colors">
-                Become a Vendor
-              </a>
-              <span className="text-slate-300">|</span>
-              <a href="#/postEnquiry" className="hover:text-blue-600 transition-colors">
-                Post Enquiry
-              </a>
+              {!user && (
+                <>
+                  <a href="#/signup?role=vendor" className="hover:text-blue-600 transition-colors">
+                    Become a Vendor
+                  </a>
+                  <span className="text-slate-300">|</span>
+                  <a href="#/postEnquiry" className="hover:text-blue-600 transition-colors">
+                    Post Enquiry
+                  </a>
+                </>
+              )}
+              {user?.role === 'customer' && (
+                <a href="#/postEnquiry" className="hover:text-blue-600 transition-colors">
+                  Post Enquiry
+                </a>
+              )}
             </div>
           </div>
         </div>
@@ -42,9 +51,11 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
             </a>
 
             <nav className="hidden md:flex items-center space-x-8">
-              <a href="#/leads" className="text-base font-medium text-slate-600 hover:text-blue-600 transition-colors">
-                Buy Leads
-              </a>
+              {user?.role === 'vendor' && (
+                <a href="#/leads" className="text-base font-medium text-slate-600 hover:text-blue-600 transition-colors">
+                  Buy Leads
+                </a>
+              )}
               <a href="#/about" className="text-base font-medium text-slate-600 hover:text-blue-600 transition-colors">
                 About Us
               </a>
@@ -118,18 +129,24 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout }) => {
             </div>
 
             <nav className="flex flex-col space-y-4">
-              <a href="#/leads" onClick={handleMobileNavClose} className="text-lg font-medium text-slate-700 hover:text-blue-600 transition-colors text-left">
-                Buy Leads
-              </a>
-              <a href="#/postEnquiry" onClick={handleMobileNavClose} className="text-lg font-medium text-slate-700 hover:text-blue-600 transition-colors text-left">
-                Post Enquiry
-              </a>
+              {user?.role === 'vendor' && (
+                <a href="#/leads" onClick={handleMobileNavClose} className="text-lg font-medium text-slate-700 hover:text-blue-600 transition-colors text-left">
+                  Buy Leads
+                </a>
+              )}
+              {(!user || user.role === 'customer') && (
+                <a href="#/postEnquiry" onClick={handleMobileNavClose} className="text-lg font-medium text-slate-700 hover:text-blue-600 transition-colors text-left">
+                  Post Enquiry
+                </a>
+              )}
                <a href="#/about" onClick={handleMobileNavClose} className="text-lg font-medium text-slate-700 hover:text-blue-600 transition-colors text-left">
                 About Us
               </a>
-              <a href="#/signup?role=vendor" onClick={handleMobileNavClose} className="text-lg font-medium text-slate-700 hover:text-blue-600 transition-colors text-left">
-                Become a Vendor
-              </a>
+              {!user && (
+                <a href="#/signup?role=vendor" onClick={handleMobileNavClose} className="text-lg font-medium text-slate-700 hover:text-blue-600 transition-colors text-left">
+                  Become a Vendor
+                </a>
+              )}
             </nav>
 
             <div className="mt-8 pt-6 border-t border-slate-200">

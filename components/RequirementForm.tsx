@@ -1,18 +1,15 @@
 import React from 'react';
-import type { BANTAnalysis, User } from '../types';
-import ConversationalEnquiryForm from './ConversationalEnquiryForm';
+import type { EnquiryFormData } from '../types';
+import EnquiryForm from './EnquiryForm';
 
 interface RequirementFormProps {
-  onFormSubmit: (analysis: BANTAnalysis) => void;
-  user: User | null;
+  onFormSubmit: (analysis: EnquiryFormData) => void;
 }
 
-const RequirementForm: React.FC<RequirementFormProps> = ({ onFormSubmit, user }) => {
+const RequirementForm: React.FC<RequirementFormProps> = ({ onFormSubmit }) => {
   return (
-    <ConversationalEnquiryForm 
+    <EnquiryForm 
       onFormSubmit={onFormSubmit}
-      user={user}
-      isHomePage={false}
     />
   );
 };

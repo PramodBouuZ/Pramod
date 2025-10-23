@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import type { User, Lead, Product, BANTAnalysis, Slide, Vendor, Testimonial } from './types';
+import type { User, Lead, Product, EnquiryFormData, Slide, Vendor, Testimonial } from './types';
 import Header from './components/Header';
 import Showcase from './components/Showcase';
 import RequirementForm from './components/RequirementForm';
@@ -262,7 +262,10 @@ function App() {
       }
       
       // Prevent non-admins from accessing admin page
-      if (targetView === 'admin' && currentUser?.role !== 'admin') {
+      // FIX: The `currentUser?.role !== 'admin'` check is redundant due to the 'Admin lock' check above.
+      // TypeScript correctly infers that `currentUser.role` cannot be 'admin' at this point, causing a type error.
+      // The logic is still correct: if a non-admin tries to access the admin page, they are redirected.
+      if (targetView === 'admin') {
         window.location.hash = '/';
         return;
       }
@@ -356,7 +359,7 @@ function App() {
     setShowPaymentModal(null);
   };
   
-  const handleFormSubmit = (analysis: BANTAnalysis) => {
+  const handleFormSubmit = (formData: EnquiryFormData) => {
     if (!currentUser) {
       alert("Please log in to submit an enquiry.");
       window.location.hash = '/login';
@@ -364,13 +367,13 @@ function App() {
     }
     const newLead: Lead = {
       id: `lead-${Date.now()}`,
-      title: analysis.title,
-      description: analysis.reason,
+      title: formData.title,
+      description: formData.description,
       companyName: currentUser.companyName || currentUser.name,
-      budget: analysis.budget,
-      authority: analysis.authority,
-      need: analysis.need,
-      timeframe: analysis.timeframe,
+      budget: formData.budget,
+      authority: formData.authority,
+      need: formData.need,
+      timeframe: formData.timeframe,
       postedAt: new Date(),
       postedBy: currentUser.name,
       email: currentUser.email,
@@ -641,7 +644,7 @@ function App() {
                     </div>
                 );
             }
-            return <RequirementForm onFormSubmit={handleFormSubmit} user={currentUser} />;
+            return <RequirementForm onFormSubmit={handleFormSubmit} />;
         case 'home':
         default:
             return (
@@ -652,8 +655,6 @@ function App() {
                     testimonials={testimonials}
                     onProductClick={(product) => setShowProductModal(product)}
                     onNavigate={(targetView) => window.location.hash = `/${targetView}`}
-                    onFormSubmit={handleFormSubmit}
-                    user={currentUser}
                 />
             );
     }

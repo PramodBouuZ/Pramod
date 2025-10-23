@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import type { Product, Slide, Vendor, Testimonial, BANTAnalysis, User } from '../types';
-import ConversationalEnquiryForm from './ConversationalEnquiryForm';
+import type { Product, Slide, Vendor, Testimonial } from '../types';
 
 interface ShowcaseProps {
     slides: Slide[];
@@ -9,11 +8,9 @@ interface ShowcaseProps {
     testimonials: Testimonial[];
     onProductClick: (product: Product) => void;
     onNavigate: (view: 'postEnquiry') => void;
-    onFormSubmit: (analysis: BANTAnalysis) => void;
-    user: User | null;
 }
 
-const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, testimonials, onProductClick, onNavigate, onFormSubmit, user }) => {
+const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, testimonials, onProductClick, onNavigate }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [productSearch, setProductSearch] = useState('');
 
@@ -84,13 +81,18 @@ const Showcase: React.FC<ShowcaseProps> = ({ slides, products, vendors, testimon
         </div>
       </div>
       
-      {/* Quick Enquiry Section */}
-      <div className="my-12">
-        <ConversationalEnquiryForm 
-          onFormSubmit={onFormSubmit}
-          user={user}
-          isHomePage={true}
-        />
+      {/* Post Enquiry CTA Section */}
+      <div className="my-12 bg-gradient-to-r from-blue-600 to-indigo-700 p-8 md:p-12 rounded-2xl text-center text-white shadow-xl">
+        <h2 className="text-3xl md:text-4xl font-bold mb-3">Ready to find your perfect vendor?</h2>
+        <p className="text-blue-100 mb-8 max-w-2xl mx-auto text-base md:text-lg">
+            Let our AI assistant guide you through the process. It's fast, easy, and ensures your requirement reaches the right people.
+        </p>
+        <a 
+            href="#/postEnquiry"
+            className="inline-block bg-yellow-400 text-blue-900 font-bold py-3 px-8 rounded-lg hover:bg-yellow-500 transition-all duration-300 ease-in-out shadow-lg hover:shadow-xl transform hover:scale-105 text-lg"
+        >
+            Post Your Enquiry Now &rarr;
+        </a>
       </div>
 
       <div className="my-12">

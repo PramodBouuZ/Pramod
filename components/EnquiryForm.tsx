@@ -5,7 +5,7 @@ interface EnquiryFormProps {
   onFormSubmit: (formData: EnquiryFormData) => void;
 }
 
-const ConversationalEnquiryForm: React.FC<EnquiryFormProps> = ({ onFormSubmit }) => {
+const EnquiryForm: React.FC<EnquiryFormProps> = ({ onFormSubmit }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [budget, setBudget] = useState('');
@@ -155,4 +155,4 @@ const ConversationalEnquiryForm: React.FC<EnquiryFormProps> = ({ onFormSubmit })
     );
 }
 
-export default ConversationalEnquiryForm;
+export default EnquiryForm;

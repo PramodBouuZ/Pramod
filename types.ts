@@ -63,13 +63,12 @@ export interface Testimonial {
   feedback: string;
 }
 
-// BANT analysis result from Gemini
-export interface BANTAnalysis {
+// Data from the enquiry form
+export interface EnquiryFormData {
+  title: string;
+  description: string;
   budget: number;
   authority: 'Decision Maker' | 'Influencer' | 'Researcher';
   need: 'High' | 'Medium' | 'Low';
   timeframe: 'Immediately' | '1-3 Months' | '3-6 Months';
-  isValid: boolean;
-  reason: string;
-  title: string;
 }
